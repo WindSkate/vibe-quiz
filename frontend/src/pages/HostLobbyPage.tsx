@@ -41,24 +41,34 @@ export default function HostLobbyPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3 mb-6">
-            {topics.map((topic) => (
+          <>
+            <div className="space-y-3 mb-4">
+              {topics.map((topic) => (
+                <button
+                  key={topic.id}
+                  onClick={() => setSelectedTopic(topic.id)}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    selectedTopic === topic.id
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-purple-300'
+                  }`}
+                >
+                  <h3 className="font-semibold text-gray-800">{topic.name}</h3>
+                  {topic.description && (
+                    <p className="text-sm text-gray-500 mt-1">{topic.description}</p>
+                  )}
+                </button>
+              ))}
+            </div>
+            <p className="text-center mb-4">
               <button
-                key={topic.id}
-                onClick={() => setSelectedTopic(topic.id)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  selectedTopic === topic.id
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-purple-300'
-                }`}
+                onClick={() => navigate('/editor')}
+                className="text-purple-600 hover:text-purple-800 text-sm font-medium"
               >
-                <h3 className="font-semibold text-gray-800">{topic.name}</h3>
-                {topic.description && (
-                  <p className="text-sm text-gray-500 mt-1">{topic.description}</p>
-                )}
+                Управление темами →
               </button>
-            ))}
-          </div>
+            </p>
+          </>
         )}
 
         {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}

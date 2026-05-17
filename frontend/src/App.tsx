@@ -7,6 +7,8 @@ import PlayerJoinPage from './pages/PlayerJoinPage'
 import PlayerWaitingPage from './pages/PlayerWaitingPage'
 import PlayerAnswerPage from './pages/PlayerAnswerPage'
 import PlayerResultsPage from './pages/PlayerResultsPage'
+import TopicListPage from './pages/TopicListPage'
+import EditorPage from './pages/EditorPage'
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/player/:code/waiting" element={<PlayerWaitingPage />} />
         <Route path="/player/:code/answer" element={<PlayerAnswerPage />} />
         <Route path="/player/:code/results" element={<PlayerResultsPage />} />
+        <Route path="/editor" element={<TopicListPage />} />
+        <Route path="/editor/:id" element={<EditorPage />} />
       </Routes>
     </BrowserRouter>
   )
