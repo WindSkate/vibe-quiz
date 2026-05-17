@@ -7,7 +7,7 @@ CREATE TABLE questions (
     option_b    VARCHAR(500) NOT NULL,
     option_c    VARCHAR(500) NOT NULL,
     option_d    VARCHAR(500) NOT NULL,
-    correct     CHAR(1) NOT NULL CHECK (correct IN ('A', 'B', 'C', 'D')),
+    correct     VARCHAR(1) NOT NULL CHECK (correct IN ('A', 'B', 'C', 'D')),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
