@@ -1,11 +1,18 @@
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import HostLobbyPage from './pages/HostLobbyPage'
+import HostWaitingPage from './pages/HostWaitingPage'
+import HostGamePage from './pages/HostGamePage'
+import HostResultsPage from './pages/HostResultsPage'
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <h1 className="text-4xl font-bold text-gray-800">Quiz Game</h1>
-      </div>
+      <Routes>
+        <Route path="/" element={<HostLobbyPage />} />
+        <Route path="/host/:code/waiting" element={<HostWaitingPage />} />
+        <Route path="/host/:code/game" element={<HostGamePage />} />
+        <Route path="/host/:code/results" element={<HostResultsPage />} />
+      </Routes>
     </BrowserRouter>
   )
 }
