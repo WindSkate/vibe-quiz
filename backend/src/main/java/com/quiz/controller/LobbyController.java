@@ -2,6 +2,7 @@ package com.quiz.controller;
 
 import com.quiz.dto.*;
 import com.quiz.service.LobbyService;
+import com.quiz.websocket.LobbyWebSocketController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 public class LobbyController {
 
     private final LobbyService lobbyService;
+    private final LobbyWebSocketController lobbyWebSocketController;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -29,7 +31,9 @@ public class LobbyController {
 
     @PostMapping("/{code}/join")
     public JoinLobbyResponse join(@PathVariable String code, @Valid @RequestBody JoinLobbyRequest request) {
-        return lobbyService.join(code, request);
+        JoinLobbyResponse response = lobbyService.join(code, request);
+        lobbyWebSocketController.broadcastLobbyUpdate(code);
+        return response;
     }
 
     @GetMapping("/{code}/players")
