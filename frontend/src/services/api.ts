@@ -26,6 +26,7 @@ export const questionApi = {
 
 export const lobbyApi = {
   create: (topicId: number) => api.post('/lobbies', { topicId }),
+  join: (code: string, data: { playerName: string }) => api.post(`/lobbies/${code}/join`, data),
   getInfo: (code: string) => api.get(`/lobbies/${code}`),
   getPlayers: (code: string) => api.get(`/lobbies/${code}/players`),
   delete: (code: string) => api.delete(`/lobbies/${code}`),
