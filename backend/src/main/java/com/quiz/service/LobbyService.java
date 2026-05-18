@@ -75,6 +75,13 @@ public class LobbyService {
             throw new LobbyException("Игра уже началась");
         }
 
+        List<PlayerDto> existingPlayers = getPlayers(code);
+        for (PlayerDto player : existingPlayers) {
+            if (player.name().equalsIgnoreCase(request.playerName())) {
+                return new JoinLobbyResponse(player.id(), getInfo(code));
+            }
+        }
+
         String playerId = UUID.randomUUID().toString();
         String playerKey = PLAYER_KEY + code + ":" + playerId;
 

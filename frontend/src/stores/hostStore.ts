@@ -37,9 +37,13 @@ export const useHostStore = create<HostState>((set, get) => ({
   loadTopics: async () => {
     try {
       const response = await topicApi.getAll();
-      set({ topics: response.data });
-    } catch {
-      set({ error: 'Не удалось загрузить темы' });
+      set({ topics: response.data, error: null });
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'message' in err
+          ? (err as { message: string }).message
+          : 'Не удалось загрузить темы';
+      set({ error: message });
     }
   },
 
@@ -63,9 +67,13 @@ export const useHostStore = create<HostState>((set, get) => ({
       }, 100);
 
       return code;
-    } catch {
-      set({ error: 'Не удалось создать лобби' });
-      throw new Error('Failed to create lobby');
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'message' in err
+          ? (err as { message: string }).message
+          : 'Не удалось создать лобби';
+      set({ error: message });
+      throw new Error(message);
     }
   },
 

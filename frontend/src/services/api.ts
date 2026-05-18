@@ -5,7 +5,19 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000,
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      throw { message: 'Нет соединения с сервером' };
+    }
+    const message = error.response.data?.message || error.response.data?.error || 'Произошла ошибка';
+    throw { message, status: error.response.status, data: error.response.data };
+  }
+);
 
 export const topicApi = {
   getAll: () => api.get('/topics'),

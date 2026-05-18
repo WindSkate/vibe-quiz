@@ -44,6 +44,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         playerName,
         lobbyCode: code,
         phase: 'waiting',
+        error: null,
       });
 
       get().connectToGame(code);
@@ -51,11 +52,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       return playerId;
     } catch (err: unknown) {
       const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+        err && typeof err === 'object' && 'message' in err
+          ? (err as { message: string }).message
           : 'Ошибка подключения';
-      set({ error: message as string });
-      throw new Error(message as string);
+      set({ error: message });
+      throw new Error(message);
     }
   },
 

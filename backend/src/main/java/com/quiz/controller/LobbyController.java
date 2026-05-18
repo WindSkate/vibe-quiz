@@ -32,7 +32,11 @@ public class LobbyController {
     @PostMapping("/{code}/join")
     public JoinLobbyResponse join(@PathVariable String code, @Valid @RequestBody JoinLobbyRequest request) {
         JoinLobbyResponse response = lobbyService.join(code, request);
-        lobbyWebSocketController.broadcastLobbyUpdate(code);
+        try {
+            lobbyWebSocketController.broadcastLobbyUpdate(code);
+        } catch (Exception ignored) {
+            // WebSocket might not be connected yet
+        }
         return response;
     }
 

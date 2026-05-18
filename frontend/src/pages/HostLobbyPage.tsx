@@ -80,6 +80,16 @@ export default function HostLobbyPage() {
         >
           {loading ? 'Создание...' : 'Создать лобби'}
         </button>
+
+        <div className="mt-4 pt-4 border-t border-gray-200 text-center">
+          <p className="text-gray-500 text-sm mb-2">Хотите присоединиться к игре?</p>
+          <button
+            onClick={() => navigate('/player/join')}
+            className="text-purple-600 hover:text-purple-800 font-medium"
+          >
+            Подключиться к лобби →
+          </button>
+        </div>
       </div>
     </div>
   );
