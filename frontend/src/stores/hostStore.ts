@@ -54,17 +54,15 @@ export const useHostStore = create<HostState>((set, get) => ({
       set({ lobbyCode: code, lobbyTopicName: topicName, phase: 'waiting', players: [], error: null });
 
       // Connect WebSocket after lobby is created
-      setTimeout(() => {
-        wsService.connect();
-        wsService.subscribeToLobby(code, (event) => {
-          if (event.type === 'LOBBY_UPDATE') {
-            set({ players: event.players });
-          }
-        });
-        wsService.subscribeToGame(code, (event) => {
-          get().handleGameEvent(event);
-        });
-      }, 100);
+      await wsService.connect();
+      wsService.subscribeToLobby(code, (event) => {
+        if (event.type === 'LOBBY_UPDATE') {
+          set({ players: event.players });
+        }
+      });
+      wsService.subscribeToGame(code, (event) => {
+        get().handleGameEvent(event);
+      });
 
       return code;
     } catch (err: unknown) {
@@ -80,6 +78,7 @@ export const useHostStore = create<HostState>((set, get) => ({
   startGame: () => {
     const { lobbyCode } = get();
     if (!lobbyCode) return;
+    if (!wsService.isConnected()) return;
 
     wsService.send(`/app/lobby/${lobbyCode}/start`, { lobbyCode });
     set({ phase: 'playing' });
@@ -88,7 +87,7 @@ export const useHostStore = create<HostState>((set, get) => ({
   handleGameEvent: (event: GameEvent) => {
     if (event.type === 'QUESTION') {
       const qEvent = event as QuestionEvent;
-      set({ currentQuestion: qEvent, timeLeft: qEvent.timeLeft });
+      set({ currentQuestion: qEvent, timeLeft: qEvent.timeLeft, phase: 'playing' });
 
       const interval = setInterval(() => {
         set((state) => {
@@ -100,7 +99,7 @@ export const useHostStore = create<HostState>((set, get) => ({
         });
       }, 1000);
     } else if (event.type === 'TIMEOUT') {
-      set({ phase: 'finished' });
+      // Stay in playing phase, wait for next question or results
     } else if (event.type === 'RESULTS') {
       const resultsEvent = event as { type: 'RESULTS'; results: GameResult[] };
       set({ results: resultsEvent.results, phase: 'finished' });

@@ -19,18 +19,22 @@ export default function PlayerAnswerPage() {
   const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
+    if (phase === 'results') {
+      navigate(`/player/${code}/results`);
+      return;
+    }
+  }, [phase, navigate, code]);
+
+  useEffect(() => {
     if (!currentQuestion) {
-      navigate(`/player/${code}/waiting`);
+      setTimeLeft(0);
+      setSelected(null);
       return;
     }
 
     setTimeLeft(currentQuestion.timeLeft);
     setSelected(null);
-
-    if (phase === 'timeout' || phase === 'results') {
-      navigate(`/player/${code}/results`);
-    }
-  }, [currentQuestion, phase, navigate, code]);
+  }, [currentQuestion]);
 
   useEffect(() => {
     if (!currentQuestion) return;
@@ -54,7 +58,16 @@ export default function PlayerAnswerPage() {
     submitAnswer(answer);
   };
 
-  if (!currentQuestion) return null;
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Время вышло!</h2>
+          <p className="text-gray-500">Ждём следующий вопрос...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex flex-col p-4">

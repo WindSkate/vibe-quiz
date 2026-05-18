@@ -47,7 +47,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         error: null,
       });
 
-      get().connectToGame(code);
+      try {
+        await get().connectToGame(code);
+      } catch {
+        // WS connection failed, but player is still in the lobby
+        // They can still see the waiting page
+        console.warn('WebSocket connection failed, will retry on reconnect');
+      }
 
       return playerId;
     } catch (err: unknown) {
@@ -60,8 +66,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  connectToGame: (code: string) => {
-    wsService.connect();
+  connectToGame: async (code: string) => {
+    await wsService.connect();
 
     wsService.subscribeToGame(code, (event: GameEvent) => {
       get().handleGameEvent(event);
@@ -77,7 +83,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (event.type === 'QUESTION') {
       set({ phase: 'answering', currentQuestion: event as QuestionEvent });
     } else if (event.type === 'TIMEOUT') {
-      set({ phase: 'timeout' });
+      set({ currentQuestion: null });
     } else if (event.type === 'RESULTS') {
       const resultsEvent = event as { type: 'RESULTS'; results: GameResult[] };
       const { playerName } = get();

@@ -6,7 +6,7 @@ import { lobbyApi } from '../services/api';
 export default function PlayerWaitingPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const { playerName, phase, disconnectFromGame } = usePlayerStore();
+  const { playerName, phase } = usePlayerStore();
   const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(() => {
@@ -32,12 +32,6 @@ export default function PlayerWaitingPage() {
       navigate(`/player/${code}/results`);
     }
   }, [phase, navigate, code]);
-
-  useEffect(() => {
-    return () => {
-      disconnectFromGame();
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">

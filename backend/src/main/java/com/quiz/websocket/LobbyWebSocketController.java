@@ -3,12 +3,11 @@ package com.quiz.websocket;
 import com.quiz.dto.*;
 import com.quiz.model.GameState;
 import com.quiz.service.GameSessionService;
+import com.quiz.service.GameTimerService;
 import com.quiz.service.LobbyService;
-import com.quiz.service.ScoringService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -22,7 +21,7 @@ public class LobbyWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final LobbyService lobbyService;
     private final GameSessionService gameSessionService;
-    private final ScoringService scoringService;
+    private final GameTimerService gameTimerService;
 
     @MessageMapping("/lobby/{code}/start")
     public void startGame(@DestinationVariable String code, StartGameRequest request) {
@@ -40,7 +39,8 @@ public class LobbyWebSocketController {
         Map<String, Object> questionData = gameSessionService.getCurrentQuestion(code);
 
         if (questionData == null) {
-            sendResults(code);
+            gameTimerService.cancelTimer(code);
+            lobbyService.updateState(code, GameState.FINISHED);
             return;
         }
 
@@ -65,38 +65,17 @@ public class LobbyWebSocketController {
         );
 
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
-    }
 
-    public void sendTimeout(String code) {
-        TimeoutEvent event = new TimeoutEvent("TIMEOUT", "Время вышло!");
-        messagingTemplate.convertAndSend("/topic/game/" + code, event);
-    }
-
-    public void sendNextQuestion(String code) {
-        gameSessionService.nextQuestion(code);
-
-        if (gameSessionService.isGameFinished(code)) {
-            sendResults(code);
-            return;
-        }
-
-        sendQuestion(code);
-    }
-
-    private void sendResults(String code) {
-        lobbyService.updateState(code, GameState.FINISHED);
-
-        List<PlayerDto> players = lobbyService.getPlayers(code);
-        Map<String, Integer> scores = gameSessionService.getScores(code);
-        List<GameResultDto> results = scoringService.calculateResults(players, scores);
-
-        ResultsEvent event = new ResultsEvent("RESULTS", results);
-        messagingTemplate.convertAndSend("/topic/game/" + code, event);
+        gameTimerService.startQuestionTimer(code);
     }
 
     public void broadcastLobbyUpdate(String code) {
-        List<PlayerDto> players = lobbyService.getPlayers(code);
-        LobbyUpdateEvent event = new LobbyUpdateEvent("LOBBY_UPDATE", players, players.size());
-        messagingTemplate.convertAndSend("/topic/lobby/" + code, event);
+        try {
+            List<PlayerDto> players = lobbyService.getPlayers(code);
+            LobbyUpdateEvent event = new LobbyUpdateEvent("LOBBY_UPDATE", players, players.size());
+            messagingTemplate.convertAndSend("/topic/lobby/" + code, event);
+        } catch (Exception e) {
+            // ignore if no subscribers yet
+        }
     }
 }

@@ -6,31 +6,56 @@ type EventCallback = (event: GameEvent) => void;
 
 class WebSocketService {
   private client: Client | null = null;
+  private connectionPromise: Promise<void> | null = null;
   private lobbySubscriptions: Map<string, EventCallback> = new Map();
   private gameSubscriptions: Map<string, EventCallback> = new Map();
 
-  connect() {
-    if (this.client?.active) return;
+  connect(): Promise<void> {
+    if (this.client?.active) return Promise.resolve();
+    if (this.connectionPromise) return this.connectionPromise;
 
-    this.client = new Client({
-      webSocketFactory: () => new SockJS('/ws'),
-      reconnectDelay: 5000,
-      onConnect: () => {
-        this.lobbySubscriptions.forEach((callback, code) => {
-          this.subscribeToLobby(code, callback);
-        });
-        this.gameSubscriptions.forEach((callback, code) => {
-          this.subscribeToGame(code, callback);
-        });
-      },
+    this.connectionPromise = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.connectionPromise = null;
+        reject(new Error('WebSocket connection timeout'));
+      }, 10000);
+
+      this.client = new Client({
+        webSocketFactory: () => new SockJS('/ws'),
+        reconnectDelay: 5000,
+        onConnect: () => {
+          clearTimeout(timeout);
+          this.connectionPromise = null;
+          this.lobbySubscriptions.forEach((callback, code) => {
+            this.subscribeToLobby(code, callback);
+          });
+          this.gameSubscriptions.forEach((callback, code) => {
+            this.subscribeToGame(code, callback);
+          });
+          resolve();
+        },
+        onWebSocketError: () => {
+          clearTimeout(timeout);
+          this.connectionPromise = null;
+          reject(new Error('WebSocket error'));
+        },
+        onStompError: (frame) => {
+          clearTimeout(timeout);
+          this.connectionPromise = null;
+          reject(new Error(frame.headers['message'] || 'STOMP error'));
+        },
+      });
+
+      this.client.activate();
     });
 
-    this.client.activate();
+    return this.connectionPromise;
   }
 
   disconnect() {
     this.client?.deactivate();
     this.client = null;
+    this.connectionPromise = null;
     this.lobbySubscriptions.clear();
     this.gameSubscriptions.clear();
   }
