@@ -46,7 +46,6 @@ public class LobbyService {
         lobbyData.put("createdAt", System.currentTimeMillis());
 
         redisTemplate.opsForHash().putAll(lobbyKey, lobbyData);
-        redisTemplate.opsForSet().add(PLAYERS_KEY + code + PLAYERS_SUFFIX);
 
         return buildLobbyDto(code, lobbyData, 0);
     }

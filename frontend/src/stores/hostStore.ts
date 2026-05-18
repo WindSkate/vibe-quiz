@@ -47,17 +47,20 @@ export const useHostStore = create<HostState>((set, get) => ({
     try {
       const response = await lobbyApi.create(topicId);
       const { code, topicName } = response.data;
-      set({ lobbyCode: code, lobbyTopicName: topicName, phase: 'waiting', players: [] });
+      set({ lobbyCode: code, lobbyTopicName: topicName, phase: 'waiting', players: [], error: null });
 
-      wsService.connect();
-      wsService.subscribeToLobby(code, (event) => {
-        if (event.type === 'LOBBY_UPDATE') {
-          set({ players: event.players });
-        }
-      });
-      wsService.subscribeToGame(code, (event) => {
-        get().handleGameEvent(event);
-      });
+      // Connect WebSocket after lobby is created
+      setTimeout(() => {
+        wsService.connect();
+        wsService.subscribeToLobby(code, (event) => {
+          if (event.type === 'LOBBY_UPDATE') {
+            set({ players: event.players });
+          }
+        });
+        wsService.subscribeToGame(code, (event) => {
+          get().handleGameEvent(event);
+        });
+      }, 100);
 
       return code;
     } catch {

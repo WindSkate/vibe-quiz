@@ -3,6 +3,7 @@ package com.quiz.mapper;
 import com.quiz.dto.QuestionDto;
 import com.quiz.entity.Question;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
@@ -16,5 +17,7 @@ public interface QuestionMapper {
 
     Question toEntity(QuestionDto dto);
 
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "id", ignore = true)
     void update(QuestionDto dto, @MappingTarget Question question);
 }

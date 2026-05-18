@@ -32,7 +32,7 @@ spring:
 
 app:
   storage:
-    location: src/main/resources/storage
+    location: storage
 
 server:
   port: 8080

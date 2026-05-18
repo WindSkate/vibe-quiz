@@ -5,25 +5,29 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class ImageService {
 
+    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
+            "image/jpeg", "image/png", "image/gif", "image/webp"
+    );
+
     private final Path storageLocation;
 
-    public ImageService(@Value("${app.storage.location}") String location) {
-        this.storageLocation = Paths.get(location).toAbsolutePath().normalize();
+    public ImageService(@Value("${app.storage.location:storage}") String location) {
+        Path basePath = Paths.get(System.getProperty("user.dir")).resolve(location);
+        this.storageLocation = basePath.toAbsolutePath().normalize();
         try {
             Files.createDirectories(this.storageLocation);
         } catch (IOException e) {
-            throw new StorageException("Не удалось создать директорию для хранения изображений", e);
+            throw new StorageException("Не удалось создать директорию: " + this.storageLocation, e);
         }
     }
 
@@ -64,13 +68,9 @@ public class ImageService {
             throw new StorageException("Файл пустой");
         }
 
-        try {
-            BufferedImage image = ImageIO.read(file.getInputStream());
-            if (image == null) {
-                throw new StorageException("Файл не является изображением");
-            }
-        } catch (IOException e) {
-            throw new StorageException("Ошибка чтения изображения", e);
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
+            throw new StorageException("Неподдерживаемый формат изображения. Разрешены: JPEG, PNG, GIF, WebP");
         }
     }
 }

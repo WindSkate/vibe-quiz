@@ -54,10 +54,12 @@ class WebSocketService {
   }
 
   send(destination: string, body: Record<string, unknown>) {
-    this.client?.publish({
-      destination,
-      body: JSON.stringify(body),
-    });
+    if (this.client?.active) {
+      this.client.publish({
+        destination,
+        body: JSON.stringify(body),
+      });
+    }
   }
 
   isConnected(): boolean {
