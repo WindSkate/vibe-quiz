@@ -195,7 +195,7 @@ export default function EditorPage() {
                     <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                       {(['A', 'B', 'C', 'D'] as const).map((letter) => {
                         const value = { A: q.optionA, B: q.optionB, C: q.optionC, D: q.optionD }[letter];
-                        const isCorrect = q.correct === letter;
+                        const isCorrect = q.correct === value;
                         return (
                           <span
                             key={letter}

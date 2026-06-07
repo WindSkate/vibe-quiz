@@ -37,16 +37,21 @@ public class GameSessionService {
 
         List<QuestionDto> selected = selectQuestions(allQuestions);
         List<Map<String, Object>> questionsJson = selected.stream()
-                .map(q -> Map.<String, Object>of(
-                        "id", q.id(),
-                        "text", q.text(),
-                        "imagePath", q.imagePath() != null ? q.imagePath() : "",
-                        "optionA", q.optionA(),
-                        "optionB", q.optionB(),
-                        "optionC", q.optionC(),
-                        "optionD", q.optionD(),
-                        "correct", q.correct()
-                ))
+                .map(q -> {
+                    List<String> opts = new ArrayList<>(List.of(
+                            q.optionA(), q.optionB(), q.optionC(), q.optionD()));
+                    Collections.shuffle(opts);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", q.id());
+                    map.put("text", q.text());
+                    map.put("imagePath", q.imagePath() != null ? q.imagePath() : "");
+                    map.put("optionA", opts.get(0));
+                    map.put("optionB", opts.get(1));
+                    map.put("optionC", opts.get(2));
+                    map.put("optionD", opts.get(3));
+                    map.put("correct", q.correct());
+                    return map;
+                })
                 .collect(Collectors.toList());
 
         String gameKey = GAME_KEY + lobbyCode;

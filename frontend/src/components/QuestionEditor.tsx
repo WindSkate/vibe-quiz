@@ -17,14 +17,26 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
   const [optionB, setOptionB] = useState(question?.optionB ?? '');
   const [optionC, setOptionC] = useState(question?.optionC ?? '');
   const [optionD, setOptionD] = useState(question?.optionD ?? '');
-  const [correct, setCorrect] = useState(question?.correct ?? 'A');
+  const [correct, setCorrect] = useState(question?.correct ?? '');
   const [error, setError] = useState('');
+
+  const handleOptionChange = (setter: (value: string) => void, oldValue: string, newValue: string) => {
+    setter(newValue);
+    if (correct === oldValue) {
+      setCorrect(newValue);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!text.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
       setError('Заполните все поля');
+      return;
+    }
+
+    if (!correct.trim()) {
+      setError('Выберите правильный ответ');
       return;
     }
 
@@ -37,7 +49,7 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
         optionB: optionB.trim(),
         optionC: optionC.trim(),
         optionD: optionD.trim(),
-        correct,
+        correct: correct.trim(),
       };
 
       if (question) {
@@ -90,9 +102,9 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
               <input
                 type="radio"
                 name="correct"
-                value={letter}
-                checked={correct === letter}
-                onChange={() => setCorrect(letter)}
+                value={value}
+                checked={correct === value}
+                onChange={() => setCorrect(value)}
                 className="w-4 h-4 accent-purple-500"
               />
               <span className="w-8 h-8 rounded-lg bg-gray-700 text-gray-300 flex items-center justify-center font-bold text-sm">
@@ -101,7 +113,7 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
               <input
                 type="text"
                 value={value}
-                onChange={(e) => setter(e.target.value)}
+                onChange={(e) => handleOptionChange(setter, value, e.target.value)}
                 placeholder={`Вариант ${letter}`}
                 className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               />

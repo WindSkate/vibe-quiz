@@ -2,7 +2,6 @@ package com.quiz.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record QuestionDto(
@@ -33,7 +32,7 @@ public record QuestionDto(
         String optionD,
 
         @NotBlank(message = "Правильный ответ обязателен")
-        @Pattern(regexp = "[A-D]", message = "Правильный ответ должен быть A, B, C или D")
+        @Size(max = 500, message = "Правильный ответ слишком длинный")
         String correct
 ) {
 }

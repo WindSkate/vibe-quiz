@@ -101,10 +101,10 @@ export default function PlayerAnswerPage() {
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
-              onClick={() => handleAnswer(letters[index])}
+              onClick={() => handleAnswer(option)}
               disabled={selected !== null}
               className={`flex items-center gap-3 bg-gray-800/60 border border-gray-700/50 rounded-xl px-4 py-4 text-left transition-all duration-200 ${
-                selected === letters[index]
+                selected === option
                   ? 'border-purple-500 bg-purple-500/20 ring-1 ring-purple-500/50'
                   : selected !== null
                     ? 'opacity-40'
