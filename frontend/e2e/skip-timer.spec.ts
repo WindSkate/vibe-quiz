@@ -49,7 +49,7 @@ test.describe('All Players Answered - Skip Timer', () => {
     await page.waitForTimeout(3000);
 
     // Verify question 1 appears
-    await expect(page.getByText(/Вопрос 1/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/1 \/ 2/)).toBeVisible({ timeout: 10000 });
     console.log('Question 1 visible on host');
 
     // Step 5: Both players answer immediately
@@ -62,7 +62,7 @@ test.describe('All Players Answered - Skip Timer', () => {
 
     // Step 6: Verify question 2 appears quickly (within 5 seconds, not 30s timer)
     const startTime = Date.now();
-    await expect(page.getByText(/Вопрос 2/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 10000 });
     const elapsed = Date.now() - startTime;
 
     console.log(`Question 2 appeared after ${elapsed}ms (should be < 5000ms)`);

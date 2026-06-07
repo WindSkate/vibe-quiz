@@ -53,24 +53,24 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-6 space-y-4">
       <h3 className="text-lg font-semibold">
         {question ? 'Редактировать вопрос' : 'Новый вопрос'}
       </h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Текст вопроса</label>
+        <label className="block text-sm font-medium text-gray-400 mb-1">Текст вопроса</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Что изображено на картинке?"
           rows={2}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Изображение</label>
+        <label className="block text-sm font-medium text-gray-400 mb-2">Изображение</label>
         <ImageUploader
           onUpload={(filename) => setImagePath(filename)}
           currentImage={imagePath}
@@ -79,12 +79,11 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
       </div>
 
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">Варианты ответа</label>
+        <label className="block text-sm font-medium text-gray-400">Варианты ответа</label>
 
         {(['A', 'B', 'C', 'D'] as const).map((letter, index) => {
           const value = [optionA, optionB, optionC, optionD][index];
           const setter = [setOptionA, setOptionB, setOptionC, setOptionD][index];
-          const colors = ['blue', 'red', 'green', 'yellow'];
 
           return (
             <div key={letter} className="flex items-center gap-2">
@@ -94,11 +93,9 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
                 value={letter}
                 checked={correct === letter}
                 onChange={() => setCorrect(letter)}
-                className="w-4 h-4"
+                className="w-4 h-4 accent-purple-500"
               />
-              <span
-                className={`w-8 h-8 rounded-lg bg-${colors[index]}-500 text-white flex items-center justify-center font-bold text-sm`}
-              >
+              <span className="w-8 h-8 rounded-lg bg-gray-700 text-gray-300 flex items-center justify-center font-bold text-sm">
                 {letter}
               </span>
               <input
@@ -106,7 +103,7 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
                 value={value}
                 onChange={(e) => setter(e.target.value)}
                 placeholder={`Вариант ${letter}`}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               />
             </div>
           );
@@ -115,19 +112,19 @@ export default function QuestionEditor({ topicId, question, onSave, onCancel }: 
         <p className="text-sm text-gray-500">Отметьте правильный ответ</p>
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
 
       <div className="flex gap-2 pt-2">
         <button
           type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-colors"
         >
           {question ? 'Сохранить' : 'Создать'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+          className="bg-gray-700 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors"
         >
           Отмена
         </button>

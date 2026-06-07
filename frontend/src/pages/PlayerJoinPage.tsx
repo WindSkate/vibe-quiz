@@ -25,14 +25,14 @@ export default function PlayerJoinPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Викторина</h1>
+    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-2">Викторина</h1>
         <p className="text-center text-gray-500 mb-8">Введите код лобби и ваше имя</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="code" className="block text-sm font-medium text-gray-400 mb-1">
               Код лобби
             </label>
             <input
@@ -42,14 +42,14 @@ export default function PlayerJoinPage() {
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
               placeholder="123"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl font-mono tracking-widest focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-center text-2xl font-mono tracking-widest text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               inputMode="numeric"
               autoComplete="off"
             />
           </div>
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-1">
               Ваше имя
             </label>
             <input
@@ -59,17 +59,17 @@ export default function PlayerJoinPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Игрок"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               autoComplete="off"
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
           <button
             type="submit"
             disabled={loading || !code || !name.trim()}
-            className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
             {loading ? 'Подключение...' : 'Подключиться'}
           </button>

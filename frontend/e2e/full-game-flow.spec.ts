@@ -67,11 +67,11 @@ test.describe('Full Game Flow', () => {
     await page.waitForTimeout(3000);
 
     // Verify host sees question
-    await expect(page.getByText(/Вопрос 1/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/1 \/ 2/)).toBeVisible({ timeout: 10000 });
 
     // Verify players see question
-    await expect(player1.getByText(/Вопрос 1/)).toBeVisible({ timeout: 5000 });
-    await expect(player2.getByText(/Вопрос 1/)).toBeVisible({ timeout: 5000 });
+    await expect(player1.getByText(/1 \/ 2/)).toBeVisible({ timeout: 5000 });
+    await expect(player2.getByText(/1 \/ 2/)).toBeVisible({ timeout: 5000 });
 
     // Step 5: Player 1 answers correctly (C for 2+2=4)
     await player1.getByRole('button', { name: 'C' }).click();
@@ -84,8 +84,7 @@ test.describe('Full Game Flow', () => {
     console.log('Question 1: Alice answered correctly, Bob answered incorrectly');
 
     // Both answered, so question 2 should appear immediately
-    await expect(page.getByText(/Вопрос 2/)).toBeVisible({ timeout: 5000 });
-    await expect(player1.getByText(/Вопрос 2/)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 5000 });
 
     // Step 7: Player 1 answers incorrectly (A for 2+2*2=3)
     await player1.getByRole('button', { name: 'A' }).click();

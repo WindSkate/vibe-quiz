@@ -46,7 +46,7 @@ export default function ImageUploader({ onUpload, currentImage, onRemove }: Imag
           <img
             src={`/images/${currentImage}`}
             alt="Вопрос"
-            className="max-h-40 rounded-lg border border-gray-200"
+            className="max-h-40 rounded-xl border border-gray-700"
           />
           {onRemove && (
             <button
@@ -60,7 +60,7 @@ export default function ImageUploader({ onUpload, currentImage, onRemove }: Imag
       )}
 
       <div className="flex items-center gap-2">
-        <label className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+        <label className="cursor-pointer bg-gray-700 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors text-sm">
           {currentImage ? 'Заменить' : 'Загрузить изображение'}
           <input
             type="file"
@@ -73,7 +73,7 @@ export default function ImageUploader({ onUpload, currentImage, onRemove }: Imag
         {uploading && <span className="text-sm text-gray-500">Загрузка...</span>}
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
     </div>
   );
 }

@@ -72,20 +72,20 @@ export default function EditorPage() {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-400 py-8">Загрузка...</p>;
+    return <p className="text-center text-gray-600 py-8 bg-gray-950 min-h-screen flex items-center justify-center">Загрузка...</p>;
   }
 
   if (!topic) {
-    return <p className="text-center text-gray-400 py-8">Тема не найдена</p>;
+    return <p className="text-center text-gray-600 py-8 bg-gray-950 min-h-screen flex items-center justify-center">Тема не найдена</p>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-950 text-white">
+      <header className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <button
             onClick={() => navigate('/editor')}
-            className="text-purple-600 hover:text-purple-800 font-medium mb-2 inline-block"
+            className="text-purple-400 hover:text-purple-300 font-medium mb-2 inline-block"
           >
             ← К списку тем
           </button>
@@ -96,19 +96,19 @@ export default function EditorPage() {
                 type="text"
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
-                className="text-2xl font-bold w-full px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                className="text-2xl font-bold w-full px-3 py-1 bg-gray-800 border border-gray-700 rounded-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
               />
               <textarea
                 value={descValue}
                 onChange={(e) => setDescValue(e.target.value)}
                 placeholder="Описание"
                 rows={2}
-                className="w-full px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 outline-none"
               />
               <div className="flex gap-2">
                 <button
                   onClick={handleSaveTopic}
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
+                  className="bg-green-600 text-white px-3 py-1 rounded-xl hover:bg-green-700 text-sm"
                 >
                   Сохранить
                 </button>
@@ -118,7 +118,7 @@ export default function EditorPage() {
                     setNameValue(topic.name);
                     setDescValue(topic.description ?? '');
                   }}
-                  className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-sm"
+                  className="bg-gray-700 text-gray-300 px-3 py-1 rounded-xl hover:bg-gray-600 text-sm"
                 >
                   Отмена
                 </button>
@@ -127,7 +127,7 @@ export default function EditorPage() {
           ) : (
             <div>
               <h1
-                className="text-2xl font-bold text-gray-800 cursor-pointer hover:text-purple-600"
+                className="text-2xl font-bold cursor-pointer hover:text-purple-400"
                 onClick={() => setEditingName(true)}
               >
                 {topic.name}
@@ -135,7 +135,7 @@ export default function EditorPage() {
               {topic.description && (
                 <p className="text-gray-500 mt-1">{topic.description}</p>
               )}
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 Вопросов: {questions.length}
               </p>
             </div>
@@ -171,24 +171,24 @@ export default function EditorPage() {
         )}
 
         {questions.length === 0 ? (
-          <p className="text-center text-gray-400 py-8">Нет вопросов. Добавьте первый!</p>
+          <p className="text-center text-gray-600 py-8">Нет вопросов. Добавьте первый!</p>
         ) : (
           <div className="space-y-3">
             {questions.map((q, index) => (
               <div
                 key={q.id}
-                className="bg-white rounded-xl shadow p-4"
+                className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <span className="text-sm text-gray-400 mr-2">#{index + 1}</span>
-                    <span className="font-medium text-gray-800">{q.text}</span>
+                    <span className="text-sm text-gray-600 mr-2">#{index + 1}</span>
+                    <span className="font-medium">{q.text}</span>
                     {q.imagePath && (
                       <div className="mt-2">
                         <img
                           src={`/images/${q.imagePath}`}
                           alt=""
-                          className="max-h-24 rounded border border-gray-200"
+                          className="max-h-24 rounded border border-gray-700"
                         />
                       </div>
                     )}
@@ -201,8 +201,8 @@ export default function EditorPage() {
                             key={letter}
                             className={`px-2 py-1 rounded ${
                               isCorrect
-                                ? 'bg-green-100 text-green-800 font-medium'
-                                : 'bg-gray-50 text-gray-600'
+                                ? 'bg-green-500/20 text-green-400 font-medium'
+                                : 'bg-gray-700/50 text-gray-400'
                             }`}
                           >
                             {letter}: {value}
@@ -214,7 +214,7 @@ export default function EditorPage() {
                   <div className="flex gap-1 ml-2">
                     <button
                       onClick={() => setEditingQuestion(q)}
-                      className="text-blue-500 hover:text-blue-700 p-1"
+                      className="text-blue-400 hover:text-blue-300 p-1"
                       title="Редактировать"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,7 +228,7 @@ export default function EditorPage() {
                     </button>
                     <button
                       onClick={() => handleDeleteQuestion(q.id)}
-                      className="text-red-500 hover:text-red-700 p-1"
+                      className="text-red-400 hover:text-red-300 p-1"
                       title="Удалить"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -52,13 +52,13 @@ export default function TopicListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-950 text-white">
+      <header className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">Редактор тем</h1>
+          <h1 className="text-2xl font-bold">Редактор тем</h1>
           <button
             onClick={() => setShowCreate(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+            className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-colors"
           >
             Создать тему
           </button>
@@ -67,40 +67,40 @@ export default function TopicListPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         {showCreate && (
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
+          <div className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-6 mb-6">
             <h2 className="text-lg font-semibold mb-4">Новая тема</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Название</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Название</label>
                 <input
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Например: География"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Описание</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Описание</label>
                 <textarea
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Краткое описание темы"
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleCreate}
                   disabled={!newName.trim()}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
                 >
                   Создать
                 </button>
                 <button
                   onClick={() => setShowCreate(false)}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
+                  className="bg-gray-700 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-600"
                 >
                   Отмена
                 </button>
@@ -110,28 +110,28 @@ export default function TopicListPage() {
         )}
 
         {loading ? (
-          <p className="text-center text-gray-400 py-8">Загрузка...</p>
+          <p className="text-center text-gray-600 py-8">Загрузка...</p>
         ) : topics.length === 0 ? (
-          <p className="text-center text-gray-400 py-8">Нет тем. Создайте первую!</p>
+          <p className="text-center text-gray-600 py-8">Нет тем. Создайте первую!</p>
         ) : (
           <div className="space-y-3">
             {topics.map((topic) => (
               <div
                 key={topic.id}
-                className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+                className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4 flex items-center justify-between"
               >
                 <div
                   className="flex-1 cursor-pointer"
                   onClick={() => navigate(`/editor/${topic.id}`)}
                 >
-                  <h3 className="font-semibold text-gray-800">{topic.name}</h3>
+                  <h3 className="font-semibold">{topic.name}</h3>
                   {topic.description && (
                     <p className="text-sm text-gray-500 mt-1">{topic.description}</p>
                   )}
                 </div>
                 <button
                   onClick={() => handleDelete(topic.id)}
-                  className="text-red-500 hover:text-red-700 p-2"
+                  className="text-red-400 hover:text-red-300 p-2"
                   title="Удалить"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export default function TopicListPage() {
 
         <button
           onClick={() => navigate('/')}
-          className="mt-6 text-purple-600 hover:text-purple-800 font-medium"
+          className="mt-6 text-purple-400 hover:text-purple-300 font-medium"
         >
           ← На главную
         </button>
