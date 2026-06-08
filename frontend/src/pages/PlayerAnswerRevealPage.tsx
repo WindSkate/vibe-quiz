@@ -31,7 +31,7 @@ export default function PlayerAnswerRevealPage() {
   const isCorrect = myAnswer === correctAnswer;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
       <div className="flex justify-between items-center px-4 py-3 bg-gray-900/80 backdrop-blur">
         <span className="text-sm text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}

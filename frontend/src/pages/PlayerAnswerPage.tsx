@@ -67,7 +67,7 @@ export default function PlayerAnswerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
       <div className="flex justify-between items-center px-4 py-3 bg-gray-900/80 backdrop-blur">
         <span className="text-sm text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
@@ -96,7 +96,7 @@ export default function PlayerAnswerPage() {
         ))}
       </div>
 
-      <div className="flex-1 flex flex-col px-4 py-3 gap-4 overflow-y-auto">
+      <div className="flex-1 flex flex-col px-4 py-3 gap-4">
         <h2 className="text-lg font-medium text-center leading-snug">
           {currentQuestion.text}
         </h2>
