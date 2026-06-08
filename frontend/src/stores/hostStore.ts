@@ -8,8 +8,10 @@ interface HostState {
   lobbyCode: string | null;
   lobbyTopicName: string | null;
   players: Player[];
-  phase: 'create' | 'waiting' | 'playing' | 'finished';
+  phase: 'create' | 'waiting' | 'playing' | 'answer_reveal' | 'finished';
   currentQuestion: QuestionEvent | null;
+  correctAnswer: string | null;
+  playerAnswers: Record<string, string>;
   results: GameResult[];
   timeLeft: number;
   error: string | null;
@@ -30,6 +32,8 @@ export const useHostStore = create<HostState>((set, get) => ({
   players: [],
   phase: 'create',
   currentQuestion: null,
+  correctAnswer: null,
+  playerAnswers: {},
   results: [],
   timeLeft: 30,
   error: null,
@@ -53,7 +57,6 @@ export const useHostStore = create<HostState>((set, get) => ({
       const { code, topicName } = response.data;
       set({ lobbyCode: code, lobbyTopicName: topicName, phase: 'waiting', players: [], error: null });
 
-      // Connect WebSocket after lobby is created
       await wsService.connect();
       wsService.subscribeToLobby(code, (event) => {
         if (event.type === 'LOBBY_UPDATE') {
@@ -99,7 +102,14 @@ export const useHostStore = create<HostState>((set, get) => ({
         });
       }, 1000);
     } else if (event.type === 'TIMEOUT') {
-      // Stay in playing phase, wait for next question or results
+      // Stay in playing phase, wait for ANSWER_REVEAL
+    } else if (event.type === 'ANSWER_REVEAL') {
+      const revealEvent = event as { type: 'ANSWER_REVEAL'; correctAnswer: string; playerAnswers: Record<string, string> };
+      set({
+        phase: 'answer_reveal',
+        correctAnswer: revealEvent.correctAnswer,
+        playerAnswers: revealEvent.playerAnswers,
+      });
     } else if (event.type === 'RESULTS') {
       const resultsEvent = event as { type: 'RESULTS'; results: GameResult[] };
       set({ results: resultsEvent.results, phase: 'finished' });
@@ -121,6 +131,8 @@ export const useHostStore = create<HostState>((set, get) => ({
       players: [],
       phase: 'create',
       currentQuestion: null,
+      correctAnswer: null,
+      playerAnswers: {},
       results: [],
       timeLeft: 30,
       error: null,

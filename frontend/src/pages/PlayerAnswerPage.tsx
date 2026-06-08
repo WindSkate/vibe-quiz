@@ -16,6 +16,10 @@ export default function PlayerAnswerPage() {
       navigate(`/player/${code}/results`);
       return;
     }
+    if (phase === 'answer_reveal') {
+      navigate(`/player/${code}/answer-reveal`);
+      return;
+    }
   }, [phase, navigate, code]);
 
   useEffect(() => {

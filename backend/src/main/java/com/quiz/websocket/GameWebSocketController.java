@@ -24,7 +24,7 @@ public class GameWebSocketController {
 
         if (answered >= players && players > 0) {
             gameTimerService.cancelTimer(request.lobbyCode());
-            lobbyWebSocketController.sendNextQuestion(request.lobbyCode());
+            lobbyWebSocketController.sendAnswerReveal(request.lobbyCode());
         }
     }
 }

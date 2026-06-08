@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.quiz</groupId>
-    <artifactId>quiz-game</artifactId>
+    <artifactId>vibe-quiz</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>quiz-game</name>
+    <name>vibe-quiz</name>
     <description>Online Quiz Game - Kahoot! style</description>
 
     <properties>

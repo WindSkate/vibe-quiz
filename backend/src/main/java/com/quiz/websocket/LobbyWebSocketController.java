@@ -37,12 +37,23 @@ public class LobbyWebSocketController {
         sendQuestion(code);
     }
 
+    @MessageMapping("/game/{code}/next")
+    public void nextQuestion(@DestinationVariable String code) {
+        LobbyDto lobby = lobbyService.getInfo(code);
+        if (!lobby.state().equals(GameState.PLAYING)) {
+            return;
+        }
+
+        sendNextQuestion(code);
+    }
+
     private void sendQuestion(String code) {
         Map<String, Object> questionData = gameSessionService.getCurrentQuestion(code);
 
         if (questionData == null) {
             gameTimerService.cancelTimer(code);
             lobbyService.updateState(code, GameState.FINISHED);
+            sendResults(code);
             return;
         }
 
@@ -69,6 +80,24 @@ public class LobbyWebSocketController {
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
 
         gameTimerService.startQuestionTimer(code);
+    }
+
+    public void sendAnswerReveal(String code) {
+        gameTimerService.cancelTimer(code);
+
+        Map<String, Object> questionData = gameSessionService.getCurrentQuestion(code);
+        if (questionData == null) {
+            sendNextQuestion(code);
+            return;
+        }
+
+        String correctAnswer = (String) questionData.get("correct");
+        Map<String, String> playerAnswers = gameSessionService.getPlayerAnswers(code);
+
+        AnswerRevealEvent event = new AnswerRevealEvent("ANSWER_REVEAL", correctAnswer, playerAnswers);
+        messagingTemplate.convertAndSend("/topic/game/" + code, event);
+
+        gameTimerService.startAnswerRevealTimer(code);
     }
 
     public void sendNextQuestion(String code) {

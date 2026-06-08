@@ -7,8 +7,10 @@ interface PlayerState {
   lobbyCode: string | null;
   playerId: string | null;
   playerName: string | null;
-  phase: 'joining' | 'waiting' | 'answering' | 'timeout' | 'results';
+  phase: 'joining' | 'waiting' | 'answering' | 'timeout' | 'answer_reveal' | 'results';
   currentQuestion: QuestionEvent | null;
+  correctAnswer: string | null;
+  playerAnswers: Record<string, string>;
   results: GameResult[];
   myRank: number | null;
   myScore: number;
@@ -19,6 +21,7 @@ interface PlayerState {
   disconnectFromGame: () => void;
   handleGameEvent: (event: GameEvent) => void;
   submitAnswer: (answer: string) => void;
+  sendNextQuestion: () => void;
   reset: () => void;
   setError: (error: string) => void;
 }
@@ -29,6 +32,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   playerName: null,
   phase: 'joining',
   currentQuestion: null,
+  correctAnswer: null,
+  playerAnswers: {},
   results: [],
   myRank: null,
   myScore: 0,
@@ -50,8 +55,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       try {
         await get().connectToGame(code);
       } catch {
-        // WS connection failed, but player is still in the lobby
-        // They can still see the waiting page
         console.warn('WebSocket connection failed, will retry on reconnect');
       }
 
@@ -84,6 +87,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       set({ phase: 'answering', currentQuestion: event as QuestionEvent });
     } else if (event.type === 'TIMEOUT') {
       set({ currentQuestion: null });
+    } else if (event.type === 'ANSWER_REVEAL') {
+      const revealEvent = event as { type: 'ANSWER_REVEAL'; correctAnswer: string; playerAnswers: Record<string, string> };
+      set({
+        phase: 'answer_reveal',
+        correctAnswer: revealEvent.correctAnswer,
+        playerAnswers: revealEvent.playerAnswers,
+      });
     } else if (event.type === 'RESULTS') {
       const resultsEvent = event as { type: 'RESULTS'; results: GameResult[] };
       const { playerName } = get();
@@ -108,6 +118,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     });
   },
 
+  sendNextQuestion: () => {
+    const { lobbyCode } = get();
+    if (!lobbyCode) return;
+
+    wsService.send(`/app/game/${lobbyCode}/next`, { lobbyCode });
+  },
+
   reset: () =>
     set({
       lobbyCode: null,
@@ -115,6 +132,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       playerName: null,
       phase: 'joining',
       currentQuestion: null,
+      correctAnswer: null,
+      playerAnswers: {},
       results: [],
       myRank: null,
       myScore: 0,

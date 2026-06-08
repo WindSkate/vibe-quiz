@@ -7,7 +7,6 @@ import com.quiz.dto.QuestionEvent;
 import com.quiz.dto.ResultsEvent;
 import com.quiz.dto.TimeoutEvent;
 import com.quiz.model.GameState;
-import com.quiz.model.GameState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class GameTimerService {
     private final ScoringService scoringService;
 
     private static final int TIME_PER_QUESTION = 30;
-    private static final int INTERMISSION_DELAY = 3;
+    private static final int ANSWER_REVEAL_DELAY = 60;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
     private final Map<String, ScheduledFuture<?>> lobbyTimers = new ConcurrentHashMap<>();
@@ -40,13 +39,20 @@ public class GameTimerService {
 
         ScheduledFuture<?> questionTimer = scheduler.schedule(() -> {
             sendTimeout(lobbyCode);
-
-            scheduler.schedule(() -> {
-                sendNextQuestion(lobbyCode);
-            }, INTERMISSION_DELAY, TimeUnit.SECONDS);
+            sendAnswerReveal(lobbyCode);
         }, TIME_PER_QUESTION, TimeUnit.SECONDS);
 
         lobbyTimers.put(lobbyCode, questionTimer);
+    }
+
+    public void startAnswerRevealTimer(String lobbyCode) {
+        cancelTimer(lobbyCode);
+
+        ScheduledFuture<?> revealTimer = scheduler.schedule(() -> {
+            sendNextQuestion(lobbyCode);
+        }, ANSWER_REVEAL_DELAY, TimeUnit.SECONDS);
+
+        lobbyTimers.put(lobbyCode, revealTimer);
     }
 
     public void cancelTimer(String lobbyCode) {
@@ -59,6 +65,30 @@ public class GameTimerService {
     private void sendTimeout(String code) {
         TimeoutEvent event = new TimeoutEvent("TIMEOUT", "Время вышло!");
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
+    }
+
+    private void sendAnswerReveal(String code) {
+        cancelTimer(code);
+
+        LobbyDto lobby = lobbyService.getInfo(code);
+        if (lobby.state().equals(GameState.FINISHED)) {
+            return;
+        }
+
+        Map<String, Object> questionData = gameSessionService.getCurrentQuestion(code);
+        if (questionData == null) {
+            sendNextQuestion(code);
+            return;
+        }
+
+        String correctAnswer = (String) questionData.get("correct");
+        Map<String, String> playerAnswers = gameSessionService.getPlayerAnswers(code);
+
+        com.quiz.dto.AnswerRevealEvent event = new com.quiz.dto.AnswerRevealEvent(
+                "ANSWER_REVEAL", correctAnswer, playerAnswers);
+        messagingTemplate.convertAndSend("/topic/game/" + code, event);
+
+        startAnswerRevealTimer(code);
     }
 
     private void sendNextQuestion(String code) {

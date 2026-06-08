@@ -12,6 +12,8 @@ export default function HostGamePage() {
   useEffect(() => {
     if (phase === 'finished') {
       navigate(`/host/${code}/results`);
+    } else if (phase === 'answer_reveal') {
+      navigate(`/host/${code}/answer-reveal`);
     }
   }, [phase, navigate, code]);
 

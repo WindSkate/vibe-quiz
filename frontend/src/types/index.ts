@@ -63,4 +63,10 @@ export interface LobbyUpdateEvent {
   playerCount: number;
 }
 
-export type GameEvent = QuestionEvent | TimeoutEvent | ResultsEvent | LobbyUpdateEvent;
+export interface AnswerRevealEvent {
+  type: 'ANSWER_REVEAL';
+  correctAnswer: string;
+  playerAnswers: Record<string, string>;
+}
+
+export type GameEvent = QuestionEvent | TimeoutEvent | AnswerRevealEvent | ResultsEvent | LobbyUpdateEvent;

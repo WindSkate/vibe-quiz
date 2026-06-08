@@ -127,6 +127,18 @@ public class GameSessionService {
         return 0;
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getPlayerAnswers(String lobbyCode) {
+        String gameKey = GAME_KEY + lobbyCode;
+        Object answers = redisTemplate.opsForHash().get(gameKey, "answers");
+        return answers instanceof Map ? (Map<String, String>) answers : new HashMap<>();
+    }
+
+    public void clearAnswers(String lobbyCode) {
+        String gameKey = GAME_KEY + lobbyCode;
+        redisTemplate.opsForHash().put(gameKey, "answers", new HashMap<String, String>());
+    }
+
     public int getPlayerCount(String lobbyCode) {
         String playersKey = "lobby:" + lobbyCode + ":players";
         Long size = redisTemplate.opsForSet().size(playersKey);
