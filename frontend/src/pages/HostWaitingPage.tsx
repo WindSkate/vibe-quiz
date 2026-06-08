@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { useHostStore } from '../stores/hostStore';
 
 export default function HostWaitingPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const { lobbyTopicName, players, phase, startGame, reset } = useHostStore();
+
+  const joinUrl = `${window.location.origin}/player/join?code=${code}`;
 
   useEffect(() => {
     if (phase === 'playing') {
@@ -28,6 +31,13 @@ export default function HostWaitingPage() {
           {lobbyTopicName && (
             <p className="text-gray-500 mt-3">Тема: {lobbyTopicName}</p>
           )}
+          
+          <div className="mt-6 flex flex-col items-center">
+            <p className="text-xs text-gray-500 mb-3">Или отсканируйте QR код</p>
+            <div className="bg-white p-3 rounded-xl">
+              <QRCodeSVG value={joinUrl} size={120} />
+            </div>
+          </div>
         </div>
 
         <div className="mb-8">

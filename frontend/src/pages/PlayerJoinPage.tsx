@@ -1,13 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePlayerStore } from '../stores/playerStore';
 
 export default function PlayerJoinPage() {
-  const [code, setCode] = useState('');
+  const [searchParams] = useSearchParams();
+  const codeFromUrl = searchParams.get('code');
+  const isValidCode = !!(codeFromUrl && /^\d{3}$/.test(codeFromUrl));
+  
+  const [code, setCode] = useState(isValidCode ? codeFromUrl : '');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { error, joinLobby, setError } = usePlayerStore();
+
+  useEffect(() => {
+    if (isValidCode && codeFromUrl) {
+      setCode(codeFromUrl);
+    }
+  }, [codeFromUrl, isValidCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +52,8 @@ export default function PlayerJoinPage() {
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
               placeholder="123"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-center text-2xl font-mono tracking-widest text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              readOnly={isValidCode}
+              className={`w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-center text-2xl font-mono tracking-widest text-white placeholder-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none ${isValidCode ? 'opacity-75 cursor-not-allowed' : ''}`}
               inputMode="numeric"
               autoComplete="off"
             />
