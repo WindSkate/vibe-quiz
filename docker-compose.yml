@@ -38,6 +38,11 @@ services:
     depends_on:
       - backend
 
+  redirect:
+    build: ./redirect
+    ports:
+      - "80:80"
+
 volumes:
   postgres_data:
     driver: local
