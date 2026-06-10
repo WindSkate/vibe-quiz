@@ -2,7 +2,7 @@
 
 ## Обзор проекта
 
-Онлайн-викторина в стиле Kahoot! Игроки подключаются к лобби через смартфоны, отвечают на вопросы с вариантами ответов, соревнуются за баллы. Результаты показываются только в конце игры.
+Онлайн-викторина в стиле Kahoot! Игроки подключаются к лобби через смартфоны, отвечают на вопросы с вариантами ответов, соревнуются за баллы. После каждого вопроса показывается разбор ответов (Answer Reveal), результаты показываются только в конце игры.
 
 ---
 
@@ -15,7 +15,6 @@
 - **Spring Data JPA** — работа с БД
 - **Lombok** — сокращение boilerplate
 - **MapStruct** — маппинг DTO <-> Entity
-- **Spring Validation** — валидация входных данных
 - **PostgreSQL** — основное хранилище (темы, вопросы)
 - **Redis** — игровые сессии, лобби, игроки (временные данные)
 - **Flyway** — миграции БД
@@ -26,62 +25,25 @@
 - **React Router** — роутинг
 - **@stomp/stompjs** — WebSocket клиент
 - **Axios** — HTTP запросы
-- **Zustand** — state management (легковесный, проще Redux)
+- **Zustand** — state management
 
 ### Инфраструктура
 - **Docker Compose** — локальная разработка (app + postgres + redis)
-- **Nginx** — reverse proxy (опционально)
-
----
-
-## Архитектура
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (React)                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │
-│  │  Host View   │  │ Player View  │  │  Editor    │ │
-│  │  (PC/TV)     │  │  (Mobile)    │  │  (Topics)  │ │
-│  └──────┬───────┘  └──────┬───────┘  └─────┬──────┘ │
-│         │                 │                 │        │
-│    REST + WebSocket (STOMP)                  │        │
-└─────────┼─────────────────┼─────────────────┼────────┘
-          │                 │                 │
-┌─────────┼─────────────────┼─────────────────┼────────┐
-│         ▼                 ▼                 ▼        │
-│              Backend (Spring Boot)                   │
-│  ┌──────────────────────────────────────────────┐   │
-│  │  REST Controllers  │  WebSocket Controllers  │   │
-│  └────────┬───────────┴──────────┬──────────────┘   │
-│           │                      │                   │
-│  ┌────────▼────────┐   ┌─────────▼──────────────┐  │
-│  │  TopicService   │   │  GameSessionService    │  │
-│  │  QuestionService│   │  LobbyService          │  │
-│  │  ImageService   │   │  ScoringService        │  │
-│  └────────┬────────┘   └─────────┬──────────────┘  │
-│           │                      │                   │
-│  ┌────────▼────────┐   ┌─────────▼──────────────┐  │
-│  │   PostgreSQL    │   │        Redis           │  │
-│  │  (topics,       │   │  (lobbies, players,    │  │
-│  │   questions)    │   │   game sessions)       │  │
-│  └─────────────────┘   └────────────────────────┘  │
-└────────────────────────────────────────────────────┘
-```
+- **Nginx** — reverse proxy для фронтенда
 
 ---
 
 ## Структура проекта
 
 ```
-quiz_from_zero/
+vibe_quiz/
 ├── backend/
 │   ├── src/main/java/com/quiz/
 │   │   ├── QuizApplication.java
 │   │   ├── config/
 │   │   │   ├── WebSocketConfig.java
 │   │   │   ├── RedisConfig.java
-│   │   │   ├── WebConfig.java
-│   │   │   └── StorageConfig.java
+│   │   │   └── WebConfig.java
 │   │   ├── controller/
 │   │   │   ├── TopicController.java
 │   │   │   ├── QuestionController.java
@@ -96,6 +58,7 @@ quiz_from_zero/
 │   │   │   ├── ImageService.java
 │   │   │   ├── LobbyService.java
 │   │   │   ├── GameSessionService.java
+│   │   │   ├── GameTimerService.java
 │   │   │   └── ScoringService.java
 │   │   ├── repository/
 │   │   │   ├── TopicRepository.java
@@ -108,62 +71,75 @@ quiz_from_zero/
 │   │   │   ├── QuestionDto.java
 │   │   │   ├── LobbyDto.java
 │   │   │   ├── PlayerDto.java
-│   │   │   └── GameResultDto.java
+│   │   │   ├── GameResultDto.java
+│   │   │   ├── QuestionEvent.java
+│   │   │   ├── AnswerRevealEvent.java
+│   │   │   ├── TimeoutEvent.java
+│   │   │   ├── ResultsEvent.java
+│   │   │   ├── LobbyUpdateEvent.java
+│   │   │   └── ... (request/response DTOs)
 │   │   ├── mapper/
 │   │   │   ├── TopicMapper.java
 │   │   │   └── QuestionMapper.java
 │   │   ├── model/
-│   │   │   ├── Lobby.java          (Redis)
-│   │   │   ├── Player.java         (Redis)
-│   │   │   ├── GameSession.java    (Redis)
-│   │   │   └── GameState.java      (enum)
+│   │   │   └── GameState.java (enum: WAITING, PLAYING, FINISHED)
 │   │   └── exception/
 │   │       ├── GlobalExceptionHandler.java
-│   │       └── ... (custom exceptions)
+│   │       ├── LobbyException.java
+│   │       ├── ResourceNotFoundException.java
+│   │       └── StorageException.java
 │   ├── src/main/resources/
 │   │   ├── application.yml
 │   │   ├── db/migration/
-│   │   └── storage/                (загруженные изображения)
+│   │   └── storage/ (загруженные изображения)
 │   ├── pom.xml
 │   └── Dockerfile
 ├── frontend/
 │   ├── src/
 │   │   ├── main.tsx
 │   │   ├── App.tsx
+│   │   ├── index.css
 │   │   ├── pages/
 │   │   │   ├── HostLobbyPage.tsx
+│   │   │   ├── HostWaitingPage.tsx
 │   │   │   ├── HostGamePage.tsx
+│   │   │   ├── HostAnswerRevealPage.tsx
 │   │   │   ├── HostResultsPage.tsx
 │   │   │   ├── PlayerJoinPage.tsx
-│   │   │   ├── PlayerAnswerPage.tsx
 │   │   │   ├── PlayerWaitingPage.tsx
+│   │   │   ├── PlayerAnswerPage.tsx
+│   │   │   ├── PlayerAnswerRevealPage.tsx
 │   │   │   ├── PlayerResultsPage.tsx
 │   │   │   ├── EditorPage.tsx
 │   │   │   └── TopicListPage.tsx
 │   │   ├── components/
-│   │   │   ├── ui/                 (базовые компоненты)
-│   │   │   ├── LobbyCode.tsx
-│   │   │   ├── QuestionCard.tsx
-│   │   │   ├── Timer.tsx
-│   │   │   ├── ResultsTable.tsx
-│   │   │   └── ...
-│   │   ├── hooks/
-│   │   │   ├── useWebSocket.ts
-│   │   │   └── useTimer.ts
+│   │   │   ├── ImageUploader.tsx
+│   │   │   └── QuestionEditor.tsx
 │   │   ├── stores/
-│   │   │   ├── gameStore.ts
-│   │   │   └── lobbyStore.ts
+│   │   │   ├── hostStore.ts
+│   │   │   └── playerStore.ts
 │   │   ├── services/
 │   │   │   ├── api.ts
 │   │   │   └── websocket.ts
-│   │   ├── types/
-│   │   │   └── index.ts
-│   │   └── assets/
+│   │   └── types/
+│   │       └── index.ts
+│   ├── e2e/
+│   │   ├── lobby-creation.spec.ts
+│   │   ├── full-game-flow.spec.ts
+│   │   ├── skip-timer.spec.ts
+│   │   ├── player-reconnection.spec.ts
+│   │   └── player-refresh-reconnection.spec.ts
+│   ├── public/
+│   │   └── favicon.png
 │   ├── index.html
 │   ├── vite.config.ts
 │   ├── tailwind.config.ts
 │   ├── package.json
 │   └── Dockerfile
+├── .data/
+│   ├── postgres_data/
+│   ├── storage/
+│   └── Potato.png (favicon source)
 ├── docker-compose.yml
 └── AGENTS.md
 ```
@@ -234,11 +210,13 @@ Fields:
 Key: game:{lobbyCode}
 Fields:
   - lobbyCode: string
-  - questions: JSON array (выбранные 20 вопросов)
+  - questions: JSON array (выбранные вопросы, до 20)
   - currentIndex: int
   - answers: JSON (playerId -> answer)
   - scores: JSON (playerId -> score)
   - startedAt: timestamp
+  - questionStartedAt: timestamp (время начала текущего вопроса)
+  - phase: string (QUESTION | ANSWER_REVEAL)
 ```
 
 ### Set: players in lobby
@@ -280,6 +258,7 @@ DELETE /api/images/{filename}   — удалить изображение
 POST   /api/lobbies             — создать лобби (возвращает код)
 GET    /api/lobbies/{code}      — получить инфо о лобби
 POST   /api/lobbies/{code}/join — присоединиться к лобби
+GET    /api/lobbies/{code}/players — получить список игроков
 ```
 
 ---
@@ -288,15 +267,18 @@ POST   /api/lobbies/{code}/join — присоединиться к лобби
 
 ### Endpoints
 ```
-Connect: /ws
+Connect: /ws (с SockJS fallback)
+
 Subscribe destinations:
   /topic/lobby/{code}        — обновления лобби (игроки подключились)
   /topic/game/{code}         — игровые события (вопрос, таймер, результаты)
-  /queue/user                — персональные сообщения (через @SendToUser)
+  /topic/player-{playerId}   — персональные сообщения для переподключившегося игрока
 
 Send destinations:
   /app/lobby/{code}/start    — начать игру (хост)
   /app/game/{code}/answer    — отправить ответ (игрок)
+  /app/game/{code}/next      — перейти к следующему вопросу (хост или таймер)
+  /app/game/{code}/state     — запросить текущее состояние игры (переподключение)
 ```
 
 ### Игровые события (server -> client)
@@ -334,6 +316,18 @@ Send destinations:
 }
 ```
 
+**ANSWER_REVEAL**
+```json
+{
+  "type": "ANSWER_REVEAL",
+  "correctAnswer": "A",
+  "playerAnswers": {
+    "playerId1": "A",
+    "playerId2": "B"
+  }
+}
+```
+
 **RESULTS**
 ```json
 {
@@ -364,26 +358,42 @@ Send destinations:
 }
 ```
 
+**NEXT_QUESTION**
+```json
+{
+  "lobbyCode": "123"
+}
+```
+
+**GET_GAME_STATE** (для переподключения)
+```json
+{
+  "lobbyCode": "123",
+  "playerId": "..."
+}
+```
+
 ---
 
 ## Фронтенд — страницы
 
 ### Host (ПК/Телевизор)
-1. **Создание лобби** — выбор темы, генерация кода, отображение QR-кода
-2. **Ожидание игроков** — список подключившихся, кнопка "Начать"
-3. **Игра** — отображение вопроса с картинкой, таймер, варианты ответов
-4. **Результаты** — таблица лидеров
+1. **HostLobbyPage** — выбор темы, создание лобби
+2. **HostWaitingPage** — список подключившихся игроков, кнопка "Начать", QR-код
+3. **HostGamePage** — отображение вопроса с картинкой, таймер, варианты ответов
+4. **HostAnswerRevealPage** — разбор ответов, правильный ответ, кто как ответил, кнопка "Следующий вопрос"
+5. **HostResultsPage** — таблица лидеров
 
 ### Player (Смартфон)
-1. **Подключение** — ввод кода лобби (3 цифры) и имени
-2. **Ожидание** — "Ждём начала игры..."
-3. **Ответ** — 4 большие кнопки с вариантами (без картинки, только текст вопроса и варианты)
-4. **Результаты** — своё место в рейтинге
+1. **PlayerJoinPage** — ввод кода лобби (3 цифры) и имени, автоматическое переподключение при наличии сессии
+2. **PlayerWaitingPage** — "Ждём начала игры..."
+3. **PlayerAnswerPage** — 4 большие кнопки с вариантами (без картинки, только текст вопроса и варианты), таймер
+4. **PlayerAnswerRevealPage** — правильный/неправильный ответ, разбор вариантов, кнопка "Продолжить"
+5. **PlayerResultsPage** — своё место в рейтинге
 
 ### Редактор
-1. **Список тем** — все темы, кнопка "Создать"
-2. **Редактирование темы** — название, описание, список вопросов
-3. **Создание/редактирование вопроса** — текст, загрузка картинки, 4 варианта, выбор правильного
+1. **TopicListPage** — список тем, кнопка "Создать"
+2. **EditorPage** — редактирование темы, список вопросов, создание/редактирование вопросов
 
 ---
 
@@ -394,171 +404,69 @@ Send destinations:
 3. Хост видит список игроков, нажимает "Начать"
 4. Если вопросов > 20, случайно выбираются 20
 5. Каждый вопрос:
-   - Хост видит вопрос с картинкой и таймер
-   - Игроки видят текст вопроса и 4 кнопки для ответа (без картинки)
-   - 30 секунд на ответ
+   - **Фаза QUESTION (30 секунд)**:
+     - Хост видит вопрос с картинкой и таймер
+     - Игроки видят текст вопроса и 4 кнопки для ответа (без картинки)
+     - Если все игроки ответили, таймер пропускается
+   - **Фаза ANSWER_REVEAL (60 секунд)**:
+     - Хост видит разбор ответов, правильный ответ, кто как ответил
+     - Игроки видят свой результат (правильно/неправильно)
+     - Хост нажимает "Следующий вопрос" или таймер автоматически переходит
    - Правильный ответ = 1 балл
 6. После последнего вопроса — таблица результатов
 
 ---
 
-## Docker Compose
+## Переподключение игроков
 
-```yaml
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: quiz
-      POSTGRES_USER: quiz
-      POSTGRES_PASSWORD: quiz
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+### Механизм
+- При входе в лобби игрок получает `playerId`, который сохраняется в `localStorage` (ключ: `quiz-player-session`)
+- При перезагрузке страницы игрок автоматически переподключается с тем же `playerId`
+- Backend разрешает повторный join с тем же именем во время фазы PLAYING
+- После переподключения игрок отправляет запрос `/app/game/{code}/state` с `playerId`
+- Backend отправляет текущее состояние игры на персональную очередь `/topic/player-{playerId}`
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
-  backend:
-    build: ./backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quiz
-      SPRING_DATASOURCE_USERNAME: quiz
-      SPRING_DATASOURCE_PASSWORD: quiz
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-
-volumes:
-  postgres_data:
-```
-
----
-
-## Соглашения по коду
-
-### Backend
-- Использовать **record** для DTO когда не нужна мутация
-- **Lombok**: `@Data`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor` для entity
-- **MapStruct**: `@Mapper(componentModel = "spring")` для всех мапперов
-- **Validation**: `@Valid`, `@NotBlank`, `@NotNull`, `@Size` на DTO
-- **Exceptions**: кастомные исключения + `@RestControllerAdvice` для глобальной обработки
-- **Naming**: сервисы — `XxxService`, репозитории — `XxxRepository`
-- **Redis**: использовать `@RedisHash` для сущностей или `RedisTemplate`
-
-### Frontend
-- **Функциональные компоненты** + hooks
-- **TypeScript strict mode**
-- **Tailwind** для стилей, без CSS-in-JS
-- **Zustand** для глобального стейта
-- **Компоненты**: PascalCase, hooks: camelCase с `use` префиксом
-- **API вызовы**: вынесены в отдельные сервисы
-
----
-
-## План разработки (по шагам)
-
-### Шаг 1: Инициализация проекта
-- [x] Создать структуру директорий
-- [x] Настроить `docker-compose.yml` (postgres + redis)
-- [x] Инициализировать Spring Boot проект (pom.xml)
-- [x] Инициализировать React проект (Vite)
-- [x] Настроить базовые конфиги
-
-### Шаг 2: База данных и CRUD для тем/вопросов
-- [x] Flyway миграции
-- [x] Entity + Repository
-- [x] DTO + MapStruct мапперы
-- [x] REST контроллеры для тем
-- [x] REST контроллеры для вопросов
-- [x] Загрузка/удаление изображений
-
-### Шаг 3: Лобби (REST + Redis)
-- [x] Создание лобби с генерацией кода
-- [x] Присоединение игрока
-- [x] Получение информации о лобби
-- [x] Хранение в Redis
-
-### Шаг 4: WebSocket + Игровой процесс
-- [x] Настройка STOMP
-- [x] Подключение к лобби через WS
-- [x] Отправка вопросов
-- [x] Приём ответов
-- [x] Таймер
-- [x] Подсчёт очков
-
-### Шаг 5: Фронтенд — Хост
-- [x] Страница создания лобби
-- [x] Страница ожидания с списком игроков
-- [x] Страница игры с вопросом и таймером
-- [x] Страница результатов
-
-### Шаг 6: Фронтенд — Игрок
-- [x] Страница подключения (код + имя)
-- [x] Страница ожидания
-- [x] Страница ответа (4 кнопки)
-- [x] Страница результатов
-
-### Шаг 7: Фронтенд — Редактор
-- [x] Список тем
-- [x] Создание/редактирование темы
-- [x] Создание/редактирование вопроса
-- [x] Загрузка изображений
-
-### Шаг 8: Полировка
-- [x] Адаптивный дизайн
-- [x] Обработка ошибок
-- [x] Анимации
-- [x] Тестирование (10 e2e тестов Playwright)
+### Сценарии переподключения
+1. **Во время QUESTION** — игрок получает текущий вопрос с оставшимся временем
+2. **Во время ANSWER_REVEAL** — игрок получает текущий вопрос (с timeLeft=0) и затем ANSWER_REVEAL
+3. **Во время WAITING** — игрок попадает на страницу ожидания
+4. **Во время FINISHED** — игрок получает RESULTS
 
 ---
 
 ## Ключевые решения
 
 ### Архитектура
-- **`GameTimerService`** — вынесен в отдельный сервис для управления таймерами вопросов, чтобы избежать циклических зависимостей между `LobbyWebSocketController` и `GameWebSocketController`
+- **GameTimerService** — вынесен в отдельный сервис для управления таймерами вопросов, чтобы избежать циклических зависимостей
 - **Skip Timer** — вопрос пропускается мгновенно, когда все игроки ответили (`answeredCount == playerCount`), не дожидаясь 30с таймера
-- **Async STOMP connect** — `wsService.connect()` возвращает Promise; `joinLobby` и `createLobby` ждут подключения, чтобы избежать ошибки "no underlying STOMP connection"
+- **Phase Tracking** — в Redis хранится текущая фаза игры (QUESTION/ANSWER_REVEAL) для корректного переподключения
+- **Personal Queue** — для переподключения используется персональная очередь `/topic/player-{playerId}`, чтобы не нарушать broadcast для других игроков
 
 ### Frontend
-- **Тёмная тема** — `bg-gray-950` фон, монохромные серые карточки вариантов ответов (без цветных кнопок)
+- **Тёмная тема** — `bg-gray-950` фон, монохромные серые карточки вариантов ответов
 - **Латинские буквы** — варианты ответов используют `A, B, C, D` (бэкенд ожидает латиницу в `correct` поле)
 - **Мобильная вёрстка** — `PlayerAnswerPage` использует `flex-col` для вариантов (одна колонка), `HostGamePage` — `grid-cols-2`
-- **React StrictMode** — убран `disconnectFromGame` из cleanup `PlayerWaitingPage`, чтобы двойной маунт не сбрасывал состояние игрока
+- **localStorage** — сессия игрока сохраняется для автоматического переподключения
 - **Zustand stores** — `hostStore` и `playerStore` управляют состоянием, WS подключение асинхронное
+- **Answer Reveal** — после каждого вопроса показывается разбор ответов, требуется нажатие "Продолжить"/"Следующий вопрос"
 
 ### Тестирование
-- **10 Playwright e2e тестов**: создание лобби, подключение 1-3 игроков, полный игровой цикл, skip timer валидация, edge cases (дубликаты имён, пустой код, невалидный код)
-- Тесты проверяют: мгновенный переход к следующему вопросу при всех ответах (< 8с), корректные результаты, отображение прогресса `N / M`
+- **13 Playwright e2e тестов**:
+  - `lobby-creation.spec.ts` — создание лобби, подключение 1-3 игроков, edge cases
+  - `full-game-flow.spec.ts` — полный игровой цикл с 2 игроками
+  - `skip-timer.spec.ts` — валидация мгновенного перехода при всех ответах
+  - `player-reconnection.spec.ts` — переподключение во время игры и answer reveal
+  - `player-refresh-reconnection.spec.ts` — автоматическое переподключение после перезагрузки страницы
 
 ### Docker
 - Фронтенд собирается в Nginx-контейнер (порт 3000), бэкенд на 8080
 - PostgreSQL и Redis запускаются вместе с приложением через `docker compose up -d`
+- Данные PostgreSQL хранятся в `.data/postgres_data/`
+- Загруженные изображения хранятся в `.data/storage/`
 
 ---
 
 ## Полезные команды
-
-### Тестовые данные
-- `.data/files_for_testing/` — картинки для тестирования загрузки изображений:
-  - `belive.png`
-  - `weather.png`
-
-### Backend
 
 ### Backend
 ```bash
@@ -574,7 +482,7 @@ cd frontend
 npm run dev                     # dev сервер
 npm run build                   # продакшн сборка
 npm run lint                    # линт
-npx playwright test             # e2e тесты (10 тестов)
+npx playwright test             # e2e тесты (13 тестов)
 ```
 
 ### Docker
@@ -582,4 +490,8 @@ npx playwright test             # e2e тесты (10 тестов)
 docker compose up -d            # запустить всё
 docker compose down             # остановить
 docker compose logs -f backend  # логи бэкенда
+docker compose up -d --build backend frontend  # пересобрать и перезапустить
 ```
+
+### Тестовые данные
+- `.data/Potato.png` — исходник для favicon
