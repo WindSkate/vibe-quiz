@@ -79,7 +79,11 @@ test.describe('Player Reconnection', () => {
 
     // Step 7: Player answers
     await player1Reconnect.getByRole('button', { name: 'C' }).click();
-    await page.waitForTimeout(2000);
+    
+    // Wait for answer reveal on host and click continue
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
 
     // Step 8: Verify game continues to question 2
     await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 10000 });
@@ -88,7 +92,11 @@ test.describe('Player Reconnection', () => {
 
     // Step 9: Answer question 2
     await player1Reconnect.getByRole('button', { name: 'D' }).click();
-    await page.waitForTimeout(2000);
+    
+    // Wait for answer reveal on host and click continue
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
 
     // Step 10: Verify results
     await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible({ timeout: 10000 });
@@ -160,15 +168,27 @@ test.describe('Player Reconnection', () => {
     await player1Reconnect.getByRole('button', { name: 'Подключиться' }).click();
     await page.waitForTimeout(3000);
 
-    // Step 8: Reconnected player should see current question (question 2)
-    // Since answer reveal auto-advances, they should see question 2
-    await expect(player1Reconnect.getByText(/2 \/ 2/)).toBeVisible({ timeout: 15000 });
+    // Step 8: Reconnected player should see answer reveal for question 1
+    // (they reconnected during answer reveal, so they get the current state)
+    await expect(player1Reconnect.getByText(/Правильно!|Неправильно/)).toBeVisible({ timeout: 10000 });
+    console.log('Reconnected player sees answer reveal for question 1');
+
+    // Click continue to go to question 2
+    await player1Reconnect.getByRole('button', { name: /Продолжить/ }).click();
+    await page.waitForTimeout(1000);
+
+    // Step 9: Verify player sees question 2
+    await expect(player1Reconnect.getByText(/2 \/ 2/)).toBeVisible({ timeout: 5000 });
     console.log('Reconnected player sees question 2 after answer reveal');
 
     // Step 9: Answer question 2
     await player1Reconnect.getByRole('button', { name: 'D' }).click();
     await player2.getByRole('button', { name: 'D' }).click();
-    await page.waitForTimeout(2000);
+    
+    // Wait for answer reveal on host and click continue
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
 
     // Step 10: Verify results
     await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible({ timeout: 10000 });

@@ -83,7 +83,12 @@ test.describe('Full Game Flow', () => {
 
     console.log('Question 1: Alice answered correctly, Bob answered incorrectly');
 
-    // Both answered, so question 2 should appear immediately
+    // Wait for answer reveal and click continue on host
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
+
+    // Both answered, so question 2 should appear
     await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 5000 });
 
     // Step 7: Player 1 answers incorrectly (A for 2+2*2=3)
@@ -96,7 +101,12 @@ test.describe('Full Game Flow', () => {
 
     console.log('Question 2: Alice answered incorrectly, Bob answered correctly');
 
-    // Both answered, so results should appear immediately (only 2 questions)
+    // Wait for answer reveal and click continue on host
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
+
+    // Both answered, so results should appear (only 2 questions)
     await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible({ timeout: 5000 });
 
     // Both players have 1 point each, sorted by score (descending)

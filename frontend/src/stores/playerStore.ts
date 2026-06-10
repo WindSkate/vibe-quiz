@@ -142,7 +142,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (event.type === 'QUESTION') {
       set({ phase: 'answering', currentQuestion: event as QuestionEvent });
     } else if (event.type === 'TIMEOUT') {
-      set({ currentQuestion: null });
+      set({ phase: 'timeout' });
     } else if (event.type === 'ANSWER_REVEAL') {
       const revealEvent = event as { type: 'ANSWER_REVEAL'; correctAnswer: string; playerAnswers: Record<string, string> };
       set({

@@ -60,17 +60,24 @@ test.describe('All Players Answered - Skip Timer', () => {
 
     console.log('Both players answered question 1');
 
-    // Step 6: Verify question 2 appears quickly (within 5 seconds, not 30s timer)
+    // Step 6: Verify answer reveal appears quickly (within 5 seconds, not 30s timer)
     const startTime = Date.now();
-    await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 10000 });
     const elapsed = Date.now() - startTime;
 
-    console.log(`Question 2 appeared after ${elapsed}ms (should be < 5000ms)`);
+    console.log(`Answer reveal appeared after ${elapsed}ms (should be < 5000ms)`);
 
     // Verify it appeared quickly (not after 30s timer)
     expect(elapsed).toBeLessThan(8000);
 
-    // Step 7: Both answer question 2
+    // Click continue to go to question 2
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
+
+    // Step 7: Verify question 2 appears
+    await expect(page.getByText(/2 \/ 2/)).toBeVisible({ timeout: 5000 });
+
+    // Step 8: Both answer question 2
     await player1.getByRole('button', { name: 'A' }).click();
     await page.waitForTimeout(300);
     await player2.getByRole('button', { name: 'D' }).click();
@@ -78,13 +85,20 @@ test.describe('All Players Answered - Skip Timer', () => {
 
     console.log('Both players answered question 2');
 
-    // Step 8: Verify results appear quickly (only 2 questions in test data)
+    // Step 9: Verify answer reveal appears quickly
     const resultsStart = Date.now();
-    await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Результаты ответа')).toBeVisible({ timeout: 10000 });
     const resultsElapsed = Date.now() - resultsStart;
 
-    console.log(`Results appeared after ${resultsElapsed}ms (should be < 5000ms)`);
+    console.log(`Answer reveal appeared after ${resultsElapsed}ms (should be < 5000ms)`);
     expect(resultsElapsed).toBeLessThan(8000);
+
+    // Click continue to go to results
+    await page.getByRole('button', { name: /Следующий вопрос/ }).click();
+    await page.waitForTimeout(1000);
+
+    // Step 10: Verify results appear
+    await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible({ timeout: 5000 });
 
     // Verify results
     await expect(page.getByText('Алиса')).toBeVisible({ timeout: 5000 });
