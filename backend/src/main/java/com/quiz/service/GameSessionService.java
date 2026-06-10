@@ -62,6 +62,8 @@ public class GameSessionService {
         gameData.put("answers", new HashMap<String, String>());
         gameData.put("scores", new HashMap<String, Integer>());
         gameData.put("startedAt", System.currentTimeMillis());
+        gameData.put("questionStartedAt", System.currentTimeMillis());
+        gameData.put("phase", "QUESTION");
 
         redisTemplate.opsForHash().putAll(gameKey, gameData);
         lobbyService.updateState(lobbyCode, GameState.PLAYING);
@@ -190,21 +192,52 @@ public class GameSessionService {
         return scores != null ? (Map<String, Integer>) scores : new HashMap<>();
     }
 
-    public boolean isGameFinished(String lobbyCode) {
-        String gameKey = GAME_KEY + lobbyCode;
-        Map<Object, Object> gameData = redisTemplate.opsForHash().entries(gameKey);
+  public boolean isGameFinished(String lobbyCode) {
+    String gameKey = GAME_KEY + lobbyCode;
+    Map<Object, Object> gameData = redisTemplate.opsForHash().entries(gameKey);
 
-        if (gameData.isEmpty()) {
-            return false;
-        }
-
-        int currentIndex = Integer.parseInt(gameData.get("currentIndex").toString());
-        List<Map<String, Object>> questions = (List<Map<String, Object>>) gameData.get("questions");
-
-        return currentIndex >= questions.size();
+    if (gameData.isEmpty()) {
+      return false;
     }
 
-    private List<QuestionDto> selectQuestions(List<QuestionDto> allQuestions) {
+    int currentIndex = Integer.parseInt(gameData.get("currentIndex").toString());
+    List<Map<String, Object>> questions = (List<Map<String, Object>>) gameData.get("questions");
+
+    return currentIndex >= questions.size();
+  }
+
+  public boolean hasPlayerAnswered(String lobbyCode, String playerId) {
+    String gameKey = GAME_KEY + lobbyCode;
+    Object answers = redisTemplate.opsForHash().get(gameKey, "answers");
+    if (answers instanceof Map) {
+      return ((Map<?, ?>) answers).containsKey(playerId);
+    }
+    return false;
+  }
+
+  public void setPhase(String lobbyCode, String phase) {
+    String gameKey = GAME_KEY + lobbyCode;
+    redisTemplate.opsForHash().put(gameKey, "phase", phase);
+  }
+
+  public String getPhase(String lobbyCode) {
+    String gameKey = GAME_KEY + lobbyCode;
+    Object phase = redisTemplate.opsForHash().get(gameKey, "phase");
+    return phase != null ? phase.toString() : "QUESTION";
+  }
+
+  public void setQuestionStartedAt(String lobbyCode, long timestamp) {
+    String gameKey = GAME_KEY + lobbyCode;
+    redisTemplate.opsForHash().put(gameKey, "questionStartedAt", timestamp);
+  }
+
+  public long getQuestionStartedAt(String lobbyCode) {
+    String gameKey = GAME_KEY + lobbyCode;
+    Object timestamp = redisTemplate.opsForHash().get(gameKey, "questionStartedAt");
+    return timestamp != null ? Long.parseLong(timestamp.toString()) : System.currentTimeMillis();
+  }
+
+  private List<QuestionDto> selectQuestions(List<QuestionDto> allQuestions) {
         if (allQuestions.size() <= MAX_QUESTIONS) {
             return allQuestions;
         }

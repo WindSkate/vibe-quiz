@@ -6,10 +6,30 @@ import { lobbyApi } from '../services/api';
 export default function PlayerWaitingPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const { playerName, phase } = usePlayerStore();
+  const { playerName, phase, playerId } = usePlayerStore();
   const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(() => {
+    if (!playerId) {
+      const savedSession = localStorage.getItem('quiz-player-session');
+      if (savedSession && code) {
+        try {
+          const { lobbyCode, playerId: savedPlayerId, playerName } = JSON.parse(savedSession);
+          if (lobbyCode === code && savedPlayerId && playerName) {
+            usePlayerStore.getState().reconnectToLobby(lobbyCode, savedPlayerId, playerName)
+              .catch(() => {
+                localStorage.removeItem('quiz-player-session');
+                window.location.href = `/player/join?code=${code}`;
+              });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('quiz-player-session');
+        }
+      }
+      window.location.href = `/player/join?code=${code}`;
+      return;
+    }
     const fetchPlayers = async () => {
       if (!code) return;
       try {
@@ -28,6 +48,8 @@ export default function PlayerWaitingPage() {
   useEffect(() => {
     if (phase === 'answering') {
       navigate(`/player/${code}/answer`);
+    } else if (phase === 'answer_reveal') {
+      navigate(`/player/${code}/answer-reveal`);
     } else if (phase === 'results') {
       navigate(`/player/${code}/results`);
     }

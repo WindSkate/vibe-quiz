@@ -71,8 +71,8 @@ public class LobbyService {
         }
 
         String state = (String) lobbyData.get("state");
-        if (!GameState.WAITING.name().equals(state)) {
-            throw new LobbyException("Игра уже началась");
+        if (GameState.FINISHED.name().equals(state)) {
+            throw new LobbyException("Игра уже завершена");
         }
 
         List<PlayerDto> existingPlayers = getPlayers(code);
@@ -80,6 +80,10 @@ public class LobbyService {
             if (player.name().equalsIgnoreCase(request.playerName())) {
                 return new JoinLobbyResponse(player.id(), getInfo(code));
             }
+        }
+
+        if (!GameState.WAITING.name().equals(state)) {
+            throw new LobbyException("Игра уже началась");
         }
 
         String playerId = UUID.randomUUID().toString();

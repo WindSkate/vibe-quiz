@@ -11,13 +11,31 @@ export default function PlayerJoinPage() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { error, joinLobby, setError } = usePlayerStore();
+  const { error, joinLobby, reconnectToLobby, setError } = usePlayerStore();
 
   useEffect(() => {
     if (isValidCode && codeFromUrl) {
       setCode(codeFromUrl);
+      
+      const savedSession = localStorage.getItem('quiz-player-session');
+      if (savedSession) {
+        try {
+          const { lobbyCode, playerId, playerName } = JSON.parse(savedSession);
+          if (lobbyCode === codeFromUrl && playerId && playerName) {
+            reconnectToLobby(lobbyCode, playerId, playerName)
+              .then(() => {
+                navigate(`/player/${lobbyCode}/waiting`);
+              })
+              .catch(() => {
+                localStorage.removeItem('quiz-player-session');
+              });
+          }
+        } catch {
+          localStorage.removeItem('quiz-player-session');
+        }
+      }
     }
-  }, [codeFromUrl, isValidCode]);
+  }, [codeFromUrl, isValidCode, reconnectToLobby, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

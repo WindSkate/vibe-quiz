@@ -84,6 +84,8 @@ public class GameTimerService {
         String correctAnswer = (String) questionData.get("correct");
         Map<String, String> playerAnswers = gameSessionService.getPlayerAnswers(code);
 
+        gameSessionService.setPhase(code, "ANSWER_REVEAL");
+
         com.quiz.dto.AnswerRevealEvent event = new com.quiz.dto.AnswerRevealEvent(
                 "ANSWER_REVEAL", correctAnswer, playerAnswers);
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
@@ -138,6 +140,9 @@ public class GameTimerService {
                 options,
                 gameSessionService.getTimePerQuestion()
         );
+
+        gameSessionService.setPhase(code, "QUESTION");
+        gameSessionService.setQuestionStartedAt(code, System.currentTimeMillis());
 
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
 

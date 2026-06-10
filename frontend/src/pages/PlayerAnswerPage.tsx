@@ -7,11 +7,34 @@ const letters = ['A', 'B', 'C', 'D'];
 export default function PlayerAnswerPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const { currentQuestion, submitAnswer, phase } = usePlayerStore();
+  const { currentQuestion, submitAnswer, phase, playerId } = usePlayerStore();
   const [selected, setSelected] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
+    if (!playerId) {
+      const savedSession = localStorage.getItem('quiz-player-session');
+      if (savedSession && code) {
+        try {
+          const { lobbyCode, playerId: savedPlayerId, playerName } = JSON.parse(savedSession);
+          if (lobbyCode === code && savedPlayerId && playerName) {
+            usePlayerStore.getState().reconnectToLobby(lobbyCode, savedPlayerId, playerName)
+              .then(() => {
+                navigate(`/player/${lobbyCode}/waiting`);
+              })
+              .catch(() => {
+                localStorage.removeItem('quiz-player-session');
+                window.location.href = `/player/join?code=${code}`;
+              });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('quiz-player-session');
+        }
+      }
+      window.location.href = `/player/join?code=${code}`;
+      return;
+    }
     if (phase === 'results') {
       navigate(`/player/${code}/results`);
       return;
@@ -20,7 +43,7 @@ export default function PlayerAnswerPage() {
       navigate(`/player/${code}/answer-reveal`);
       return;
     }
-  }, [phase, navigate, code]);
+  }, [phase, navigate, code, playerId]);
 
   useEffect(() => {
     if (!currentQuestion) {

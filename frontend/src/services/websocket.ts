@@ -9,6 +9,7 @@ class WebSocketService {
   private connectionPromise: Promise<void> | null = null;
   private lobbySubscriptions: Map<string, EventCallback> = new Map();
   private gameSubscriptions: Map<string, EventCallback> = new Map();
+  private personalSubscriptions: Map<string, EventCallback> = new Map();
 
   connect(): Promise<void> {
     if (this.client?.active) return Promise.resolve();
@@ -31,6 +32,9 @@ class WebSocketService {
           });
           this.gameSubscriptions.forEach((callback, code) => {
             this.subscribeToGame(code, callback);
+          });
+          this.personalSubscriptions.forEach((callback, playerId) => {
+            this.subscribeToPersonalQueue(playerId, callback);
           });
           resolve();
         },
@@ -58,6 +62,7 @@ class WebSocketService {
     this.connectionPromise = null;
     this.lobbySubscriptions.clear();
     this.gameSubscriptions.clear();
+    this.personalSubscriptions.clear();
   }
 
   subscribeToLobby(code: string, callback: EventCallback) {
@@ -73,6 +78,15 @@ class WebSocketService {
     this.gameSubscriptions.set(code, callback);
     if (this.client?.active) {
       this.client.subscribe(`/topic/game/${code}`, (message: IMessage) => {
+        callback(JSON.parse(message.body));
+      });
+    }
+  }
+
+  subscribeToPersonalQueue(playerId: string, callback: EventCallback) {
+    this.personalSubscriptions.set(playerId, callback);
+    if (this.client?.active) {
+      this.client.subscribe(`/topic/player-${playerId}`, (message: IMessage) => {
         callback(JSON.parse(message.body));
       });
     }

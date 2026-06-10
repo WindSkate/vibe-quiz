@@ -3,6 +3,22 @@ import { GameEvent, GameResult, QuestionEvent } from '../types';
 import { wsService } from '../services/websocket';
 import { lobbyApi } from '../services/api';
 
+const STORAGE_KEY = 'quiz-player-session';
+
+interface PlayerSession {
+  lobbyCode: string;
+  playerId: string;
+  playerName: string;
+}
+
+const saveSession = (session: PlayerSession) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+};
+
+const clearSession = () => {
+  localStorage.removeItem(STORAGE_KEY);
+};
+
 interface PlayerState {
   lobbyCode: string | null;
   playerId: string | null;
@@ -17,6 +33,7 @@ interface PlayerState {
   error: string | null;
 
   joinLobby: (code: string, playerName: string) => Promise<string>;
+  reconnectToLobby: (code: string, playerId: string, playerName: string) => Promise<void>;
   connectToGame: (code: string) => void;
   disconnectFromGame: () => void;
   handleGameEvent: (event: GameEvent) => void;
@@ -44,6 +61,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       const response = await lobbyApi.join(code, { playerName });
       const { playerId } = response.data;
 
+      saveSession({ lobbyCode: code, playerId, playerName });
+
       set({
         playerId,
         playerName,
@@ -69,12 +88,49 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
+  reconnectToLobby: async (code: string, playerId: string, playerName: string) => {
+    try {
+      await lobbyApi.join(code, { playerName });
+
+      set({
+        playerId,
+        playerName,
+        lobbyCode: code,
+        phase: 'waiting',
+        error: null,
+      });
+
+      try {
+        await get().connectToGame(code);
+      } catch {
+        console.warn('WebSocket connection failed on reconnect');
+      }
+    } catch (err: unknown) {
+      clearSession();
+      const message =
+        err && typeof err === 'object' && 'message' in err
+          ? (err as { message: string }).message
+          : 'Ошибка переподключения';
+      set({ error: message });
+      throw new Error(message);
+    }
+  },
+
   connectToGame: async (code: string) => {
     await wsService.connect();
 
     wsService.subscribeToGame(code, (event: GameEvent) => {
       get().handleGameEvent(event);
     });
+
+    const { playerId } = get();
+    if (playerId) {
+      wsService.subscribeToPersonalQueue(playerId, (event: GameEvent) => {
+        get().handleGameEvent(event);
+      });
+
+      wsService.send(`/app/game/${code}/state`, { lobbyCode: code, playerId });
+    }
   },
 
   disconnectFromGame: () => {
@@ -125,7 +181,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     wsService.send(`/app/game/${lobbyCode}/next`, { lobbyCode });
   },
 
-  reset: () =>
+  reset: () => {
+    clearSession();
     set({
       lobbyCode: null,
       playerId: null,
@@ -138,7 +195,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       myRank: null,
       myScore: 0,
       error: null,
-    }),
+    });
+  },
 
   setError: (error: string) => set({ error }),
 }));

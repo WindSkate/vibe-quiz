@@ -77,6 +77,9 @@ public class LobbyWebSocketController {
                 gameSessionService.getTimePerQuestion()
         );
 
+        gameSessionService.setPhase(code, "QUESTION");
+        gameSessionService.setQuestionStartedAt(code, System.currentTimeMillis());
+
         messagingTemplate.convertAndSend("/topic/game/" + code, event);
 
         gameTimerService.startQuestionTimer(code);
@@ -93,6 +96,8 @@ public class LobbyWebSocketController {
 
         String correctAnswer = (String) questionData.get("correct");
         Map<String, String> playerAnswers = gameSessionService.getPlayerAnswers(code);
+
+        gameSessionService.setPhase(code, "ANSWER_REVEAL");
 
         AnswerRevealEvent event = new AnswerRevealEvent("ANSWER_REVEAL", correctAnswer, playerAnswers);
         messagingTemplate.convertAndSend("/topic/game/" + code, event);

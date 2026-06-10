@@ -1,21 +1,67 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePlayerStore } from '../stores/playerStore';
 
 const letters = ['A', 'B', 'C', 'D'];
+const ANSWER_REVEAL_TIME = 60;
 
 export default function PlayerAnswerRevealPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const { currentQuestion, correctAnswer, playerAnswers, playerId, phase, sendNextQuestion } = usePlayerStore();
+  const [timeLeft, setTimeLeft] = useState(ANSWER_REVEAL_TIME);
 
   useEffect(() => {
+    if (!playerId) {
+      const savedSession = localStorage.getItem('quiz-player-session');
+      if (savedSession && code) {
+        try {
+          const { lobbyCode, playerId: savedPlayerId, playerName } = JSON.parse(savedSession);
+          if (lobbyCode === code && savedPlayerId && playerName) {
+            usePlayerStore.getState().reconnectToLobby(lobbyCode, savedPlayerId, playerName)
+              .then(() => {
+                navigate(`/player/${lobbyCode}/waiting`);
+              })
+              .catch(() => {
+                localStorage.removeItem('quiz-player-session');
+                window.location.href = `/player/join?code=${code}`;
+              });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('quiz-player-session');
+        }
+      }
+      window.location.href = `/player/join?code=${code}`;
+      return;
+    }
     if (phase === 'results') {
       navigate(`/player/${code}/results`);
     } else if (phase === 'answering') {
       navigate(`/player/${code}/answer`);
     }
-  }, [phase, navigate, code]);
+  }, [phase, navigate, code, playerId]);
+
+  useEffect(() => {
+    setTimeLeft(ANSWER_REVEAL_TIME);
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    if (!currentQuestion || !correctAnswer) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          sendNextQuestion();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentQuestion, correctAnswer, sendNextQuestion]);
 
   if (!currentQuestion || !correctAnswer) {
     return (
@@ -36,7 +82,13 @@ export default function PlayerAnswerRevealPage() {
         <span className="text-sm text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
-        <span className="text-sm text-gray-400">Результат</span>
+        <span
+          className={`text-lg font-bold tabular-nums ${
+            timeLeft <= 10 ? 'text-red-400' : 'text-gray-300'
+          }`}
+        >
+          {timeLeft}с
+        </span>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 gap-4">
