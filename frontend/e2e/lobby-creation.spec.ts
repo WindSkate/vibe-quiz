@@ -17,7 +17,7 @@ test.describe('Lobby Creation Flow', () => {
     await expect(page.getByRole('heading', { name: 'Создать лобби' })).toBeVisible();
 
     // Click first topic
-    await page.locator('button').filter({ has: page.getByText('Математика') }).click();
+    await page.locator('button').filter({ has: page.getByText('Математика') }).first().click();
     await page.waitForTimeout(300);
 
     // Click "Создать лобби"
@@ -59,7 +59,7 @@ test.describe('Player Join Flow', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    await page.locator('button').filter({ has: page.getByText('Математика') }).click();
+    await page.locator('button').filter({ has: page.getByText('Математика') }).first().click();
     await page.waitForTimeout(300);
     await page.getByRole('button', { name: 'Создать лобби' }).click();
     await page.waitForTimeout(2000);
@@ -165,7 +165,7 @@ test.describe('Player Join Flow', () => {
     console.log('3 players joined successfully');
   });
 
-  test('should handle duplicate player name (same player reconnecting)', async ({ page }) => {
+  test('should show error for duplicate player name', async ({ page }) => {
     // Player joins first time
     const player1 = await page.context().newPage();
     await player1.goto('/player/join', { waitUntil: 'networkidle' });
@@ -175,7 +175,7 @@ test.describe('Player Join Flow', () => {
     await player1.getByRole('button', { name: 'Подключиться' }).click();
     await player1.waitForTimeout(1500);
 
-    // Same player joins again (simulating reconnect)
+    // Another player tries to join with same name (without playerId)
     const player2 = await page.context().newPage();
     await player2.goto('/player/join', { waitUntil: 'networkidle' });
     await player2.waitForTimeout(500);
@@ -184,16 +184,15 @@ test.describe('Player Join Flow', () => {
     await player2.getByRole('button', { name: 'Подключиться' }).click();
     await player2.waitForTimeout(1500);
 
-    // Verify only 1 player with that name
+    // Verify error message is shown
+    await expect(player2.getByText('Игрок с таким именем уже существует')).toBeVisible({ timeout: 5000 });
+
+    // Verify only 1 player in lobby
     await page.waitForTimeout(1000);
     const playerCount = page.getByText('Игроки (1)');
     await expect(playerCount).toBeVisible({ timeout: 5000 });
 
-    // Count occurrences of the name
-    const nameElements = await page.getByText('Повторюшка').count();
-    expect(nameElements).toBe(1);
-
-    console.log('Duplicate player name handled correctly');
+    console.log('Duplicate player name error shown correctly');
   });
 });
 

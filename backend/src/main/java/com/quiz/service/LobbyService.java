@@ -78,6 +78,12 @@ public class LobbyService {
         List<PlayerDto> existingPlayers = getPlayers(code);
         for (PlayerDto player : existingPlayers) {
             if (player.name().equalsIgnoreCase(request.playerName())) {
+                if (request.playerId() != null && request.playerId().equals(player.id())) {
+                    return new JoinLobbyResponse(player.id(), getInfo(code));
+                }
+                if (GameState.WAITING.name().equals(state)) {
+                    throw new LobbyException("Игрок с таким именем уже существует");
+                }
                 return new JoinLobbyResponse(player.id(), getInfo(code));
             }
         }

@@ -90,7 +90,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   reconnectToLobby: async (code: string, playerId: string, playerName: string) => {
     try {
-      await lobbyApi.join(code, { playerName });
+      await lobbyApi.join(code, { playerName, playerId });
 
       set({
         playerId,
