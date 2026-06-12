@@ -56,12 +56,12 @@ export default function PlayerWaitingPage() {
   }, [phase, navigate, code]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md text-center">
-        <div className="relative inline-block mb-6">
-          <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center">
+    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-[5vw]">
+      <div className="w-full text-center" style={{ maxWidth: '90vw' }}>
+        <div className="relative inline-block mb-[4vh]">
+          <div className="w-[clamp(4rem,10vw,5rem)] h-[clamp(4rem,10vw,5rem)] bg-gray-800 rounded-full flex items-center justify-center">
             <svg
-              className="w-10 h-10 text-gray-400"
+              className="w-[clamp(2rem,5vw,2.5rem)] h-[clamp(2rem,5vw,2.5rem)] text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -74,21 +74,21 @@ export default function PlayerWaitingPage() {
               />
             </svg>
           </div>
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-950 animate-pulse" />
+          <div className="absolute -top-[0.5vw] -right-[0.5vw] w-[clamp(1.25rem,3vw,1.5rem)] h-[clamp(1.25rem,3vw,1.5rem)] bg-green-500 rounded-full border-2 border-gray-950 animate-pulse" />
         </div>
 
-        <h2 className="text-2xl font-bold mb-2">Ждём начала игры...</h2>
-        <p className="text-gray-400 mb-6">
+        <h2 className="text-[clamp(1.5rem,4vw,2rem)] font-bold mb-[1.5vh]">Ждём начала игры...</h2>
+        <p className="text-gray-400 mb-[4vh] text-[clamp(1rem,2.5vw,1.25rem)]">
           Привет, <span className="font-semibold text-purple-400">{playerName}</span>!
         </p>
 
-        <div className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-4 mb-6">
-          <span className="text-gray-300">
+        <div className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-[3vh] mb-[4vh]">
+          <span className="text-gray-300 text-[clamp(1rem,2.5vw,1.25rem)]">
             {playerCount} {playerCount === 1 ? 'игрок' : playerCount < 5 ? 'игрока' : 'игроков'} в лобби
           </span>
         </div>
 
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-[clamp(0.75rem,2vw,0.875rem)]">
           Хост скоро запустит игру. Не закрывайте эту страницу.
         </p>
       </div>

@@ -65,9 +65,9 @@ export default function PlayerAnswerRevealPage() {
 
   if (!currentQuestion || !correctAnswer) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-[5vw]">
         <div className="text-center">
-          <p className="text-white text-xl">Загрузка...</p>
+          <p className="text-white text-[clamp(1.25rem,3vw,1.75rem)]">Загрузка...</p>
         </div>
       </div>
     );
@@ -78,12 +78,12 @@ export default function PlayerAnswerRevealPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center px-4 py-3 bg-gray-900/80 backdrop-blur">
-        <span className="text-sm text-gray-400">
+      <div className="flex justify-between items-center px-[4vw] py-[2vh] bg-gray-900/80 backdrop-blur">
+        <span className="text-[clamp(0.875rem,2vw,1.125rem)] text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
         <span
-          className={`text-lg font-bold tabular-nums ${
+          className={`text-[clamp(1.25rem,3vw,1.75rem)] font-bold tabular-nums ${
             timeLeft <= 10 ? 'text-red-400' : 'text-gray-300'
           }`}
         >
@@ -91,21 +91,21 @@ export default function PlayerAnswerRevealPage() {
         </span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 gap-4">
-        <div className={`text-center py-4 px-6 rounded-2xl ${
+      <div className="flex-1 flex flex-col items-center justify-center px-[4vw] py-[3vh] gap-[3vh]">
+        <div className={`text-center py-[3vh] px-[5vw] rounded-2xl ${
           isCorrect
             ? 'bg-green-500/20 border-2 border-green-500'
             : 'bg-red-500/20 border-2 border-red-500'
         }`}>
-          <span className="text-4xl">{isCorrect ? '✓' : '✗'}</span>
-          <p className={`text-xl font-bold mt-2 ${
+          <span className="text-[clamp(2.5rem,6vw,4rem)]">{isCorrect ? '✓' : '✗'}</span>
+          <p className={`text-[clamp(1.25rem,3vw,2rem)] font-bold mt-[1.5vh] ${
             isCorrect ? 'text-green-400' : 'text-red-400'
           }`}>
             {isCorrect ? 'Правильно!' : 'Неправильно'}
           </p>
         </div>
 
-        <div className="w-full max-w-md space-y-2 mt-4">
+        <div className="w-full space-y-[1.5vh] mt-[2vh]" style={{ maxWidth: '90vw' }}>
           {currentQuestion.options.map((option, index) => {
             const isCorrectOption = option === correctAnswer;
             const isMyAnswer = option === myAnswer;
@@ -124,9 +124,9 @@ export default function PlayerAnswerRevealPage() {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 border-2 ${borderColor} ${bgColor}`}
+                className={`flex items-center gap-[3vw] rounded-xl px-[4vw] py-[2vh] border-2 ${borderColor} ${bgColor}`}
               >
-                <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                <span className={`flex-shrink-0 w-[clamp(2rem,5vw,2.5rem)] h-[clamp(2rem,5vw,2.5rem)] rounded-full flex items-center justify-center text-[clamp(0.875rem,2vw,1rem)] font-semibold ${
                   isCorrectOption
                     ? 'bg-green-500 text-white'
                     : isMyAnswer && !isCorrect
@@ -135,12 +135,12 @@ export default function PlayerAnswerRevealPage() {
                 }`}>
                   {letters[index]}
                 </span>
-                <span className="text-base">{option}</span>
+                <span className="text-[clamp(1rem,2.5vw,1.25rem)]">{option}</span>
                 {isCorrectOption && (
-                  <span className="ml-auto text-green-400">✓</span>
+                  <span className="ml-auto text-green-400 text-[clamp(1.25rem,3vw,1.75rem)]">✓</span>
                 )}
                 {isMyAnswer && !isCorrect && (
-                  <span className="ml-auto text-red-400">✗</span>
+                  <span className="ml-auto text-red-400 text-[clamp(1.25rem,3vw,1.75rem)]">✗</span>
                 )}
               </div>
             );
@@ -149,7 +149,8 @@ export default function PlayerAnswerRevealPage() {
 
         <button
           onClick={sendNextQuestion}
-          className="mt-4 bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition-colors font-semibold text-lg w-full max-w-md"
+          className="mt-[3vh] bg-purple-600 text-white px-[6vw] py-[2vh] rounded-xl hover:bg-purple-700 transition-colors font-semibold text-[clamp(1rem,2.5vw,1.5rem)] w-full"
+          style={{ maxWidth: '90vw' }}
         >
           Продолжить →
         </button>

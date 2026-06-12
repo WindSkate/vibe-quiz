@@ -31,16 +31,16 @@ export default function HostGamePage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      <div className="flex justify-between items-center px-6 py-3 bg-gray-900/80 backdrop-blur">
-        <span className="text-sm text-gray-400">
+      <div className="flex justify-between items-center px-[3vw] py-[2vh] bg-gray-900/80 backdrop-blur">
+        <span className="text-[clamp(0.875rem,1.5vw,1.25rem)] text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1">
+        <div className="flex items-center gap-[1.5vw]">
+          <div className="flex gap-[0.4vw]">
             {Array.from({ length: currentQuestion.totalQuestions }).map((_, i) => (
               <div
                 key={i}
-                className={`w-2 h-2 rounded-full ${
+                className={`w-[0.8vw] h-[0.8vw] min-w-[8px] min-h-[8px] rounded-full ${
                   i < currentQuestion.questionNumber - 1
                     ? 'bg-purple-500'
                     : i === currentQuestion.questionNumber - 1
@@ -51,7 +51,7 @@ export default function HostGamePage() {
             ))}
           </div>
           <span
-            className={`text-lg font-bold tabular-nums ${
+            className={`text-[clamp(1.25rem,2.5vw,2.5rem)] font-bold tabular-nums ${
               timeLeft <= 10 ? 'text-red-400' : 'text-gray-300'
             }`}
           >
@@ -60,31 +60,32 @@ export default function HostGamePage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-4 gap-6">
+      <div className="flex-1 flex flex-col items-center justify-center px-[3vw] py-[3vh] gap-[3vh]">
         {imageUrl && (
-          <div className="w-full max-w-2xl flex justify-center">
+          <div className="w-full flex justify-center" style={{ maxWidth: '80vw' }}>
             <img
               src={imageUrl}
               alt="Вопрос"
-              className="rounded-xl max-h-72 object-contain"
+              className="rounded-xl object-contain"
+              style={{ maxHeight: '40vh' }}
             />
           </div>
         )}
 
-        <h2 className="text-2xl md:text-3xl font-medium text-center max-w-3xl leading-snug">
+        <h2 className="text-[clamp(1.5rem,4vw,4rem)] font-medium text-center leading-snug" style={{ maxWidth: '85vw' }}>
           {currentQuestion.text}
         </h2>
 
-        <div className="grid grid-cols-2 gap-3 w-full max-w-3xl mt-2">
+        <div className="grid grid-cols-2 gap-[1.5vw] w-full mt-[2vh]" style={{ maxWidth: '85vw' }}>
           {currentQuestion.options.map((option, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 bg-gray-800/60 border border-gray-700/50 rounded-xl px-5 py-4"
+              className="flex items-center gap-[1.5vw] bg-gray-800/60 border border-gray-700/50 rounded-xl px-[2vw] py-[2vh]"
             >
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+              <span className="flex-shrink-0 w-[clamp(2.5rem,4vw,4rem)] h-[clamp(2.5rem,4vw,4rem)] rounded-full bg-gray-700 flex items-center justify-center text-[clamp(1rem,2vw,1.5rem)] font-semibold text-gray-300">
                 {letters[index]}
               </span>
-              <span className="text-base">{option}</span>
+              <span className="text-[clamp(1rem,2.5vw,2rem)]">{option}</span>
             </div>
           ))}
         </div>

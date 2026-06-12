@@ -80,10 +80,10 @@ export default function PlayerAnswerPage() {
 
   if (phase === 'timeout') {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-[5vw]">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Время вышло!</h2>
-          <p className="text-gray-400">Ждём следующий вопрос...</p>
+          <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold text-white mb-[2vh]">Время вышло!</h2>
+          <p className="text-gray-400 text-[clamp(1rem,2.5vw,1.5rem)]">Ждём следующий вопрос...</p>
         </div>
       </div>
     );
@@ -95,12 +95,12 @@ export default function PlayerAnswerPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center px-4 py-3 bg-gray-900/80 backdrop-blur">
-        <span className="text-sm text-gray-400">
+      <div className="flex justify-between items-center px-[4vw] py-[2vh] bg-gray-900/80 backdrop-blur">
+        <span className="text-[clamp(0.875rem,2vw,1.125rem)] text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
         <span
-          className={`text-lg font-bold tabular-nums ${
+          className={`text-[clamp(1.25rem,3vw,1.75rem)] font-bold tabular-nums ${
             timeLeft <= 10 ? 'text-red-400' : 'text-gray-300'
           }`}
         >
@@ -108,11 +108,11 @@ export default function PlayerAnswerPage() {
         </span>
       </div>
 
-      <div className="flex gap-1 px-4 py-2 justify-center">
+      <div className="flex gap-[1vw] px-[4vw] py-[1.5vh] justify-center">
         {Array.from({ length: currentQuestion.totalQuestions }).map((_, i) => (
           <div
             key={i}
-            className={`w-1.5 h-1.5 rounded-full ${
+            className={`w-[1.5vw] h-[1.5vw] min-w-[6px] min-h-[6px] rounded-full ${
               i < currentQuestion.questionNumber - 1
                 ? 'bg-purple-500'
                 : i === currentQuestion.questionNumber - 1
@@ -123,18 +123,18 @@ export default function PlayerAnswerPage() {
         ))}
       </div>
 
-      <div className="flex-1 flex flex-col px-4 py-3 gap-4">
-        <h2 className="text-lg font-medium text-center leading-snug">
+      <div className="flex-1 flex flex-col px-[4vw] py-[2vh] gap-[2vh]">
+        <h2 className="text-[clamp(1.125rem,3vw,1.75rem)] font-medium text-center leading-snug">
           {currentQuestion.text}
         </h2>
 
-        <div className="flex flex-col gap-2 mt-2">
+        <div className="flex flex-col gap-[1.5vh] mt-[2vh]">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(option)}
               disabled={selected !== null}
-              className={`flex items-center gap-3 bg-gray-800/60 border border-gray-700/50 rounded-xl px-4 py-4 text-left transition-all duration-200 ${
+              className={`flex items-center gap-[3vw] bg-gray-800/60 border border-gray-700/50 rounded-xl px-[4vw] py-[2.5vh] text-left transition-all duration-200 ${
                 selected === option
                   ? 'border-purple-500 bg-purple-500/20 ring-1 ring-purple-500/50'
                   : selected !== null
@@ -142,10 +142,10 @@ export default function PlayerAnswerPage() {
                     : 'active:bg-gray-700/60'
               }`}
             >
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-semibold text-gray-300">
+              <span className="flex-shrink-0 w-[clamp(2rem,5vw,2.5rem)] h-[clamp(2rem,5vw,2.5rem)] rounded-full bg-gray-700 flex items-center justify-center text-[clamp(0.875rem,2vw,1rem)] font-semibold text-gray-300">
                 {letters[index]}
               </span>
-              <span className="text-base">{option}</span>
+              <span className="text-[clamp(1rem,2.5vw,1.25rem)]">{option}</span>
             </button>
           ))}
         </div>

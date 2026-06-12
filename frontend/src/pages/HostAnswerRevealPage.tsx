@@ -40,29 +40,30 @@ export default function HostAnswerRevealPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      <div className="flex justify-between items-center px-6 py-3 bg-gray-900/80 backdrop-blur">
-        <span className="text-sm text-gray-400">
+      <div className="flex justify-between items-center px-[3vw] py-[2vh] bg-gray-900/80 backdrop-blur">
+        <span className="text-[clamp(0.875rem,1.5vw,1.25rem)] text-gray-400">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
-        <span className="text-sm text-gray-400">Результаты ответа</span>
+        <span className="text-[clamp(0.875rem,1.5vw,1.25rem)] text-gray-400">Результаты ответа</span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-4 gap-4">
+      <div className="flex-1 flex flex-col items-center justify-center px-[3vw] py-[3vh] gap-[2vh]">
         {imageUrl && (
-          <div className="w-full max-w-2xl flex justify-center">
+          <div className="w-full flex justify-center" style={{ maxWidth: '70vw' }}>
             <img
               src={imageUrl}
               alt="Вопрос"
-              className="rounded-xl max-h-48 object-contain"
+              className="rounded-xl object-contain"
+              style={{ maxHeight: '30vh' }}
             />
           </div>
         )}
 
-        <h2 className="text-xl md:text-2xl font-medium text-center max-w-3xl leading-snug">
+        <h2 className="text-[clamp(1.25rem,3vw,3rem)] font-medium text-center leading-snug" style={{ maxWidth: '85vw' }}>
           {currentQuestion.text}
         </h2>
 
-        <div className="grid grid-cols-2 gap-3 w-full max-w-3xl mt-2">
+        <div className="grid grid-cols-2 gap-[1.5vw] w-full mt-[2vh]" style={{ maxWidth: '85vw' }}>
           {currentQuestion.options.map((option, index) => {
             const isCorrect = option === correctAnswer;
             const playerNames = getPlayerNamesForAnswer(option);
@@ -70,31 +71,31 @@ export default function HostAnswerRevealPage() {
             return (
               <div
                 key={index}
-                className={`flex flex-col gap-2 rounded-xl px-5 py-4 border-2 transition-all ${
+                className={`flex flex-col gap-[1vh] rounded-xl px-[2vw] py-[2vh] border-2 transition-all ${
                   isCorrect
                     ? 'border-green-500 bg-green-500/20'
                     : 'border-gray-700/50 bg-gray-800/60'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                <div className="flex items-center gap-[1.5vw]">
+                  <span className={`flex-shrink-0 w-[clamp(2.5rem,4vw,4rem)] h-[clamp(2.5rem,4vw,4rem)] rounded-full flex items-center justify-center text-[clamp(1rem,2vw,1.5rem)] font-semibold ${
                     isCorrect
                       ? 'bg-green-500 text-white'
                       : 'bg-gray-700 text-gray-300'
                   }`}>
                     {letters[index]}
                   </span>
-                  <span className="text-base">{option}</span>
+                  <span className="text-[clamp(1rem,2.5vw,2rem)]">{option}</span>
                   {isCorrect && (
-                    <span className="ml-auto text-green-400 text-lg">✓</span>
+                    <span className="ml-auto text-green-400 text-[clamp(1.5rem,3vw,2.5rem)]">✓</span>
                   )}
                 </div>
                 {playerNames.length > 0 && (
-                  <div className="flex flex-wrap gap-1 ml-11">
+                  <div className="flex flex-wrap gap-[0.5vw] ml-[5vw]">
                     {playerNames.map((name, i) => (
                       <span
                         key={i}
-                        className="text-xs bg-gray-700/80 text-gray-300 px-2 py-0.5 rounded-full"
+                        className="text-[clamp(0.75rem,1.2vw,1rem)] bg-gray-700/80 text-gray-300 px-[1vw] py-[0.5vh] rounded-full"
                       >
                         {name}
                       </span>
@@ -108,7 +109,7 @@ export default function HostAnswerRevealPage() {
 
         <button
           onClick={sendNextQuestion}
-          className="mt-4 bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition-colors font-semibold text-lg"
+          className="mt-[3vh] bg-purple-600 text-white px-[4vw] py-[2vh] rounded-xl hover:bg-purple-700 transition-colors font-semibold text-[clamp(1.25rem,2.5vw,2rem)]"
         >
           Следующий вопрос →
         </button>
