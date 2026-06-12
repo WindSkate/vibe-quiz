@@ -1,0 +1,16 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - test-runner
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - run: | 
+          cd ~/projects/vibe-quiz
+          git pull origin main
+          docker compose up -d --build
