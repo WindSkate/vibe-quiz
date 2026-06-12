@@ -10,55 +10,75 @@ export default function PlayerResultsPage() {
     navigate('/');
   };
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-[5vw]">
-      <div className="w-full" style={{ maxWidth: '90vw' }}>
-        <h1 className="text-[clamp(1.5rem,4vw,2rem)] font-bold text-center mb-[3vh]">Результаты</h1>
+  const getRankBadge = (rank: number) => {
+    switch (rank) {
+      case 1: return 'rank-badge-gold';
+      case 2: return 'rank-badge-silver';
+      case 3: return 'rank-badge-bronze';
+      default: return 'rank-badge-default';
+    }
+  };
 
-        <div className="text-center mb-[3vh]">
-          <p className="text-gray-400 text-[clamp(0.875rem,2vw,1rem)]">
-            {playerName}, ваше место:{' '}
-            <span className="text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-purple-400">#{myRank}</span>
-          </p>
-          <p className="text-gray-500 mt-[1vh] text-[clamp(0.875rem,2vw,1rem)]">
-            Баллов: <span className="font-semibold text-gray-300">{myScore}</span>
-          </p>
+  const getRankEmoji = (rank: number) => {
+    switch (rank) {
+      case 1: return '🏆';
+      case 2: return '🥈';
+      case 3: return '🥉';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-surface text-white flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-radial from-primary-600/10 via-transparent to-transparent" />
+      
+      <div className="w-full max-w-md relative z-10 animate-fade-in">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold font-display mb-4">Результаты</h1>
+          
+          <div className="glass-card p-6 mb-6">
+            <p className="text-gray-400 text-sm mb-2">{playerName}</p>
+            <div className="flex items-center justify-center gap-4">
+              <div className="text-center">
+                <p className="text-4xl font-bold text-gradient-primary font-display">#{myRank}</p>
+                <p className="text-gray-500 text-xs mt-1">Место</p>
+              </div>
+              <div className="w-px h-12 bg-white/10" />
+              <div className="text-center">
+                <p className="text-4xl font-bold text-white font-display">{myScore}</p>
+                <p className="text-gray-500 text-xs mt-1">Баллов</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-[1vh]">
+        <div className="space-y-2 mb-6">
           {results.map((result) => (
             <div
               key={result.rank}
-              className={`flex items-center justify-between px-[4vw] py-[2vh] rounded-xl border ${
+              className={`flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all ${
                 result.name === playerName
-                  ? 'bg-purple-500/10 border-purple-500/30'
-                  : 'bg-gray-800/40 border-gray-700/30'
+                  ? 'bg-primary-500/10 border-primary-500/30'
+                  : 'bg-white/5 border-white/5'
               }`}
             >
-              <div className="flex items-center gap-[2vw]">
-                <span
-                  className={`w-[clamp(2rem,5vw,2.5rem)] h-[clamp(2rem,5vw,2.5rem)] rounded-full flex items-center justify-center font-bold text-[clamp(0.75rem,2vw,0.875rem)] ${
-                    result.rank === 1
-                      ? 'bg-yellow-500 text-gray-900'
-                      : result.rank === 2
-                        ? 'bg-gray-600 text-white'
-                        : result.rank === 3
-                          ? 'bg-orange-500 text-gray-900'
-                          : 'bg-gray-700 text-gray-300'
-                  }`}
-                >
-                  {result.rank}
+              <div className="flex items-center gap-3">
+                <div className={getRankBadge(result.rank)}>
+                  {result.rank <= 3 ? getRankEmoji(result.rank) : result.rank}
+                </div>
+                <span className={`font-medium ${result.name === playerName ? 'text-primary-300' : 'text-gray-200'}`}>
+                  {result.name}
+                  {result.name === playerName && <span className="text-xs text-primary-400 ml-2">(вы)</span>}
                 </span>
-                <span className="font-medium text-[clamp(0.875rem,2vw,1rem)]">{result.name}</span>
               </div>
-              <span className="font-bold text-gray-300 text-[clamp(0.875rem,2vw,1rem)]">{result.score}</span>
+              <span className="font-bold text-lg text-gray-300">{result.score}</span>
             </div>
           ))}
         </div>
 
         <button
           onClick={handleGoHome}
-          className="w-full mt-[3vh] bg-purple-600 text-white py-[2vh] rounded-xl font-semibold text-[clamp(1rem,2.5vw,1.25rem)] hover:bg-purple-700 transition-colors"
+          className="btn-primary w-full text-lg"
         >
           На главную
         </button>

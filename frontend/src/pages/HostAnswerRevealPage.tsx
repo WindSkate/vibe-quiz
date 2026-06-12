@@ -19,7 +19,7 @@ export default function HostAnswerRevealPage() {
 
   if (!currentQuestion || !correctAnswer) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-surface flex items-center justify-center">
         <p className="text-white text-xl">Загрузка...</p>
       </div>
     );
@@ -39,31 +39,36 @@ export default function HostAnswerRevealPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      <div className="flex justify-between items-center px-[3vw] py-[2vh] bg-gray-900/80 backdrop-blur">
-        <span className="text-[clamp(0.875rem,1.5vw,1.25rem)] text-gray-400">
+    <div className="min-h-screen bg-surface text-white flex flex-col">
+      <div className="flex justify-between items-center px-8 py-4 bg-white/5 backdrop-blur-lg border-b border-white/5">
+        <span className="text-lg text-gray-400 font-medium">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
-        <span className="text-[clamp(0.875rem,1.5vw,1.25rem)] text-gray-400">Результаты ответа</span>
+        <span className="text-lg text-gray-400 flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Результаты ответа
+        </span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-[3vw] py-[3vh] gap-[2vh]">
+      <div className="flex-1 flex flex-col items-center justify-center px-8 py-6 gap-6 animate-fade-in">
         {imageUrl && (
-          <div className="w-full flex justify-center" style={{ maxWidth: '70vw' }}>
+          <div className="w-full flex justify-center" style={{ maxWidth: '65vw' }}>
             <img
               src={imageUrl}
               alt="Вопрос"
-              className="rounded-xl object-contain"
-              style={{ maxHeight: '30vh' }}
+              className="rounded-3xl object-contain shadow-xl border border-white/10"
+              style={{ maxHeight: '25vh' }}
             />
           </div>
         )}
 
-        <h2 className="text-[clamp(1.25rem,3vw,3rem)] font-medium text-center leading-snug" style={{ maxWidth: '85vw' }}>
+        <h2 className="text-[clamp(1.25rem,2.5vw,2.5rem)] font-medium text-center leading-snug font-display" style={{ maxWidth: '85vw' }}>
           {currentQuestion.text}
         </h2>
 
-        <div className="grid grid-cols-2 gap-[1.5vw] w-full mt-[2vh]" style={{ maxWidth: '85vw' }}>
+        <div className="grid grid-cols-2 gap-4 w-full mt-4" style={{ maxWidth: '85vw' }}>
           {currentQuestion.options.map((option, index) => {
             const isCorrect = option === correctAnswer;
             const playerNames = getPlayerNamesForAnswer(option);
@@ -71,31 +76,37 @@ export default function HostAnswerRevealPage() {
             return (
               <div
                 key={index}
-                className={`flex flex-col gap-[1vh] rounded-xl px-[2vw] py-[2vh] border-2 transition-all ${
+                className={`flex flex-col gap-3 rounded-3xl px-6 py-5 border-2 transition-all ${
                   isCorrect
-                    ? 'border-green-500 bg-green-500/20'
-                    : 'border-gray-700/50 bg-gray-800/60'
+                    ? 'border-accent-green/50 bg-accent-green/10 shadow-glow-green'
+                    : 'border-white/5 bg-white/5'
                 }`}
               >
-                <div className="flex items-center gap-[1.5vw]">
-                  <span className={`flex-shrink-0 w-[clamp(2.5rem,4vw,4rem)] h-[clamp(2.5rem,4vw,4rem)] rounded-full flex items-center justify-center text-[clamp(1rem,2vw,1.5rem)] font-semibold ${
+                <div className="flex items-center gap-4">
+                  <span className={`flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold ${
                     isCorrect
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-gray-300'
+                      ? 'bg-accent-green text-white'
+                      : 'bg-white/10 text-gray-400'
                   }`}>
                     {letters[index]}
                   </span>
-                  <span className="text-[clamp(1rem,2.5vw,2rem)]">{option}</span>
+                  <span className="text-[clamp(1rem,2vw,1.5rem)] text-gray-200 flex-1">{option}</span>
                   {isCorrect && (
-                    <span className="ml-auto text-green-400 text-[clamp(1.5rem,3vw,2.5rem)]">✓</span>
+                    <div className="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center">
+                      <span className="text-accent-green text-2xl">✓</span>
+                    </div>
                   )}
                 </div>
                 {playerNames.length > 0 && (
-                  <div className="flex flex-wrap gap-[0.5vw] ml-[5vw]">
+                  <div className="flex flex-wrap gap-2 ml-16">
                     {playerNames.map((name, i) => (
                       <span
                         key={i}
-                        className="text-[clamp(0.75rem,1.2vw,1rem)] bg-gray-700/80 text-gray-300 px-[1vw] py-[0.5vh] rounded-full"
+                        className={`text-sm px-3 py-1 rounded-full ${
+                          isCorrect
+                            ? 'bg-accent-green/20 text-accent-green'
+                            : 'bg-white/5 text-gray-400'
+                        }`}
                       >
                         {name}
                       </span>
@@ -109,9 +120,14 @@ export default function HostAnswerRevealPage() {
 
         <button
           onClick={sendNextQuestion}
-          className="mt-[3vh] bg-purple-600 text-white px-[4vw] py-[2vh] rounded-xl hover:bg-purple-700 transition-colors font-semibold text-[clamp(1.25rem,2.5vw,2rem)]"
+          className="btn-primary text-xl px-10 py-4 mt-6"
         >
-          Следующий вопрос →
+          <span className="flex items-center gap-2">
+            Следующий вопрос
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </span>
         </button>
       </div>
     </div>

@@ -65,9 +65,9 @@ export default function PlayerAnswerRevealPage() {
 
   if (!currentQuestion || !correctAnswer) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-[5vw]">
+      <div className="min-h-screen bg-surface flex items-center justify-center p-6">
         <div className="text-center">
-          <p className="text-white text-[clamp(1.25rem,3vw,1.75rem)]">Загрузка...</p>
+          <p className="text-white text-xl">Загрузка...</p>
         </div>
       </div>
     );
@@ -77,70 +77,72 @@ export default function PlayerAnswerRevealPage() {
   const isCorrect = myAnswer === correctAnswer;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center px-[4vw] py-[2vh] bg-gray-900/80 backdrop-blur">
-        <span className="text-[clamp(0.875rem,2vw,1.125rem)] text-gray-400">
+    <div className="min-h-screen bg-surface text-white flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center px-5 py-4 bg-white/5 backdrop-blur-lg border-b border-white/5">
+        <span className="text-sm text-gray-400 font-medium">
           {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
         </span>
-        <span
-          className={`text-[clamp(1.25rem,3vw,1.75rem)] font-bold tabular-nums ${
-            timeLeft <= 10 ? 'text-red-400' : 'text-gray-300'
-          }`}
-        >
+        <span className={`text-lg font-bold tabular-nums font-mono ${
+          timeLeft <= 10 ? 'text-accent-red' : 'text-gray-400'
+        }`}>
           {timeLeft}с
         </span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-[4vw] py-[3vh] gap-[3vh]">
-        <div className={`text-center py-[3vh] px-[5vw] rounded-2xl ${
+      <div className="flex-1 flex flex-col items-center justify-center px-5 py-6 gap-6 animate-fade-in">
+        <div className={`text-center py-6 px-8 rounded-3xl border-2 animate-bounce-in ${
           isCorrect
-            ? 'bg-green-500/20 border-2 border-green-500'
-            : 'bg-red-500/20 border-2 border-red-500'
+            ? 'bg-accent-green/10 border-accent-green/50 shadow-glow-green'
+            : 'bg-accent-red/10 border-accent-red/50 shadow-glow-red'
         }`}>
-          <span className="text-[clamp(2.5rem,6vw,4rem)]">{isCorrect ? '✓' : '✗'}</span>
-          <p className={`text-[clamp(1.25rem,3vw,2rem)] font-bold mt-[1.5vh] ${
-            isCorrect ? 'text-green-400' : 'text-red-400'
+          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 ${
+            isCorrect ? 'bg-accent-green/20' : 'bg-accent-red/20'
+          }`}>
+            <span className="text-4xl">{isCorrect ? '✓' : '✗'}</span>
+          </div>
+          <p className={`text-xl font-bold font-display ${
+            isCorrect ? 'text-accent-green' : 'text-accent-red'
           }`}>
             {isCorrect ? 'Правильно!' : 'Неправильно'}
           </p>
+          {isCorrect && (
+            <p className="text-accent-green/70 text-sm mt-1">+1 балл</p>
+          )}
         </div>
 
-        <div className="w-full space-y-[1.5vh] mt-[2vh]" style={{ maxWidth: '90vw' }}>
+        <div className="w-full space-y-3">
           {currentQuestion.options.map((option, index) => {
             const isCorrectOption = option === correctAnswer;
             const isMyAnswer = option === myAnswer;
 
-            let borderColor = 'border-gray-700/50';
-            let bgColor = 'bg-gray-800/60';
+            let borderClass = 'border-white/10';
+            let bgClass = 'bg-white/5';
+            let letterClass = 'bg-white/10 text-gray-300';
 
             if (isCorrectOption) {
-              borderColor = 'border-green-500';
-              bgColor = 'bg-green-500/20';
+              borderClass = 'border-accent-green/50';
+              bgClass = 'bg-accent-green/10';
+              letterClass = 'bg-accent-green text-white';
             } else if (isMyAnswer && !isCorrect) {
-              borderColor = 'border-red-500';
-              bgColor = 'bg-red-500/20';
+              borderClass = 'border-accent-red/50';
+              bgClass = 'bg-accent-red/10';
+              letterClass = 'bg-accent-red text-white';
             }
 
             return (
               <div
                 key={index}
-                className={`flex items-center gap-[3vw] rounded-xl px-[4vw] py-[2vh] border-2 ${borderColor} ${bgColor}`}
+                className={`flex items-center gap-4 rounded-2xl px-5 py-4 border-2 ${borderClass} ${bgClass} transition-all duration-300`}
               >
-                <span className={`flex-shrink-0 w-[clamp(2rem,5vw,2.5rem)] h-[clamp(2rem,5vw,2.5rem)] rounded-full flex items-center justify-center text-[clamp(0.875rem,2vw,1rem)] font-semibold ${
-                  isCorrectOption
-                    ? 'bg-green-500 text-white'
-                    : isMyAnswer && !isCorrect
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-700 text-gray-300'
-                }`}>
+                <span className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-semibold ${letterClass}`}>
                   {letters[index]}
                 </span>
-                <span className="text-[clamp(1rem,2.5vw,1.25rem)]">{option}</span>
+                <span className="text-base font-medium flex-1">{option}</span>
                 {isCorrectOption && (
-                  <span className="ml-auto text-green-400 text-[clamp(1.25rem,3vw,1.75rem)]">✓</span>
+                  <span className="text-accent-green text-xl">✓</span>
                 )}
                 {isMyAnswer && !isCorrect && (
-                  <span className="ml-auto text-red-400 text-[clamp(1.25rem,3vw,1.75rem)]">✗</span>
+                  <span className="text-accent-red text-xl">✗</span>
                 )}
               </div>
             );
@@ -149,8 +151,7 @@ export default function PlayerAnswerRevealPage() {
 
         <button
           onClick={sendNextQuestion}
-          className="mt-[3vh] bg-purple-600 text-white px-[6vw] py-[2vh] rounded-xl hover:bg-purple-700 transition-colors font-semibold text-[clamp(1rem,2.5vw,1.5rem)] w-full"
-          style={{ maxWidth: '90vw' }}
+          className="btn-primary w-full text-lg mt-4"
         >
           Продолжить →
         </button>
