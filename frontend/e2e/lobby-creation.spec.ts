@@ -117,9 +117,8 @@ test.describe('Player Join Flow', () => {
     await expect(page.getByText('Игрок1')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Игрок2')).toBeVisible({ timeout: 5000 });
 
-    // Verify player count
-    const playerCount = page.getByText('Игроки (2)');
-    await expect(playerCount).toBeVisible();
+    // Verify player count - check for the number in the badge
+    await expect(page.locator('span', { hasText: /^2$/ }).first()).toBeVisible();
 
     console.log('2 players joined successfully');
   });
@@ -158,9 +157,8 @@ test.describe('Player Join Flow', () => {
     await expect(page.getByText('Боб')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Чарли')).toBeVisible({ timeout: 5000 });
 
-    // Verify player count
-    const playerCount = page.getByText('Игроки (3)');
-    await expect(playerCount).toBeVisible();
+    // Verify player count - check for the number in the badge
+    await expect(page.locator('span', { hasText: /^3$/ }).first()).toBeVisible();
 
     console.log('3 players joined successfully');
   });
@@ -189,8 +187,8 @@ test.describe('Player Join Flow', () => {
 
     // Verify only 1 player in lobby
     await page.waitForTimeout(1000);
-    const playerCount = page.getByText('Игроки (1)');
-    await expect(playerCount).toBeVisible({ timeout: 5000 });
+    // Verify player count - check for the number in the badge
+    await expect(page.locator('span', { hasText: /^1$/ }).first()).toBeVisible({ timeout: 5000 });
 
     console.log('Duplicate player name error shown correctly');
   });

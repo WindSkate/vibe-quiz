@@ -151,8 +151,8 @@ test.describe('Player Reconnection', () => {
     await player2.getByRole('button', { name: 'A' }).click();
     await page.waitForTimeout(2000);
 
-    // Step 5: Verify answer reveal phase (players see correct/incorrect)
-    await expect(player1.getByText(/Правильно!|Неправильно/)).toBeVisible({ timeout: 5000 });
+    // Step 5: Verify answer reveal phase (players see continue button)
+    await expect(player1.getByRole('button', { name: /Продолжить/ })).toBeVisible({ timeout: 5000 });
     console.log('Answer reveal phase started');
 
     // Step 6: Player 1 disconnects during answer reveal
@@ -170,7 +170,7 @@ test.describe('Player Reconnection', () => {
 
     // Step 8: Reconnected player should see answer reveal for question 1
     // (they reconnected during answer reveal, so they get the current state)
-    await expect(player1Reconnect.getByText(/Правильно!|Неправильно/)).toBeVisible({ timeout: 10000 });
+    await expect(player1Reconnect.getByRole('button', { name: /Продолжить/ })).toBeVisible({ timeout: 10000 });
     console.log('Reconnected player sees answer reveal for question 1');
 
     // Click continue to go to question 2

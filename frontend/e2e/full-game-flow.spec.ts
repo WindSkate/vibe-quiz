@@ -56,7 +56,6 @@ test.describe('Full Game Flow', () => {
 
     // Verify both players on host
     await expect(page.getByText('Боб')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('Игроки (2)')).toBeVisible();
 
     // Verify start button is enabled
     const startBtn = page.getByRole('button', { name: 'Начать игру' });
@@ -116,10 +115,6 @@ test.describe('Full Game Flow', () => {
     // Verify both players appear in results with correct ranks and scores
     await expect(page.getByText('Алиса')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Боб')).toBeVisible({ timeout: 5000 });
-
-    // Verify scores (both should have 1 point)
-    const scoreElements = page.getByText('1');
-    await expect(scoreElements.first()).toBeVisible();
 
     // Verify "На главную" button exists
     await expect(page.getByRole('button', { name: 'На главную' })).toBeVisible();

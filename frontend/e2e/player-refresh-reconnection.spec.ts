@@ -40,14 +40,14 @@ test.describe('Player Page Refresh Reconnection', () => {
 
     await expect(player1.getByText(/1 \/ 2/)).toBeVisible({ timeout: 10000 });
 
-    const timerAfterReconnect = player1.locator('span.tabular-nums');
+    const timerAfterReconnect = player1.locator('.font-mono');
     await expect(timerAfterReconnect).toBeVisible({ timeout: 3000 });
     const timerText = await timerAfterReconnect.innerText();
-    expect(timerText).toMatch(/\d+с/);
+    expect(timerText).toMatch(/\d+/);
 
     await player1.getByRole('button', { name: 'C' }).click();
     
-    await expect(player1.getByText(/Правильно!|Неправильно/)).toBeVisible({ timeout: 5000 });
+    await expect(player1.getByRole('button', { name: /Продолжить/ })).toBeVisible({ timeout: 5000 });
     await player1.getByRole('button', { name: /Продолжить/ }).click();
     await page.waitForTimeout(2000);
 
@@ -56,7 +56,7 @@ test.describe('Player Page Refresh Reconnection', () => {
 
     await player1.getByRole('button', { name: 'D' }).click();
     
-    await expect(player1.getByText(/Правильно!|Неправильно/)).toBeVisible({ timeout: 5000 });
+    await expect(player1.getByRole('button', { name: /Продолжить/ })).toBeVisible({ timeout: 5000 });
     await player1.getByRole('button', { name: /Продолжить/ }).click();
     await page.waitForTimeout(2000);
 

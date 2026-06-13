@@ -89,27 +89,7 @@ export default function PlayerAnswerRevealPage() {
         </span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-5 py-6 gap-6 animate-fade-in">
-        <div className={`text-center py-6 px-8 rounded-3xl border-2 animate-bounce-in ${
-          isCorrect
-            ? 'bg-accent-green/10 border-accent-green/50 shadow-glow-green'
-            : 'bg-accent-red/10 border-accent-red/50 shadow-glow-red'
-        }`}>
-          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 ${
-            isCorrect ? 'bg-accent-green/20' : 'bg-accent-red/20'
-          }`}>
-            <span className="text-4xl">{isCorrect ? '✓' : '✗'}</span>
-          </div>
-          <p className={`text-xl font-bold font-display ${
-            isCorrect ? 'text-accent-green' : 'text-accent-red'
-          }`}>
-            {isCorrect ? 'Правильно!' : 'Неправильно'}
-          </p>
-          {isCorrect && (
-            <p className="text-accent-green/70 text-sm mt-1">+1 балл</p>
-          )}
-        </div>
-
+      <div className="flex-1 flex flex-col items-center px-5 py-6 gap-6 animate-fade-in">
         <div className="w-full space-y-3">
           {currentQuestion.options.map((option, index) => {
             const isCorrectOption = option === correctAnswer;

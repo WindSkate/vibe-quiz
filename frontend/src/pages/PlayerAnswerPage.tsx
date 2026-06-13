@@ -144,7 +144,7 @@ export default function PlayerAnswerPage() {
           {currentQuestion.text}
         </h2>
 
-        <div className="flex flex-col gap-3 mt-auto">
+        <div className="flex flex-col gap-3">
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
