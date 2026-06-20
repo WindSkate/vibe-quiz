@@ -12,4 +12,6 @@ jobs:
       - run: | 
           cd ~/projects/vibe-quiz
           git pull origin main
+          mkdir -p .data/postgres_data
+          mkdir -p .data/storage
           docker compose up -d --build
